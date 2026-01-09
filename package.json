@@ -8,15 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "codegen": "kysely-codegen",
-    "migrate:create": "./scripts/migrations/create.sh",
-    "migrate:up": "./scripts/migrations/migrate.sh",
-    "migrate:down": "./scripts/migrations/down.sh",
-    "migrate:down-all": "./scripts/migrations/down-all.sh",
-    "migrate:version": "./scripts/migrations/version.sh",
-    "migrate:force": "./scripts/migrations/force.sh"
+    "migrate:create": "./scripts/migrate/create.sh",
+    "migrate:up": "./scripts/migrate/up.sh",
+    "migrate:down": "./scripts/migrate/down.sh",
+    "migrate:version": "./scripts/migrate/version.sh",
+    "migrate:force": "./scripts/migrate/force.sh"
   },
   "dependencies": {
     "kysely": "^0.28.9",
+    "kysely-codegen": "^0.19.0",
     "next": "16.1.1",
     "pg": "^8.16.3",
     "react": "19.2.3",
