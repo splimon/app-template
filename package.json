@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:create": "./scripts/migrations/create.sh",
+    "migrate:up": "./scripts/migrations/migrate.sh",
+    "migrate:down": "./scripts/migrations/down.sh",
+    "migrate:down-all": "./scripts/migrations/down-all.sh",
+    "migrate:version": "./scripts/migrations/version.sh",
+    "migrate:force": "./scripts/migrations/force.sh"
   },
   "dependencies": {
     "next": "16.1.1",
