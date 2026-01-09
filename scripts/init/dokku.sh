@@ -63,11 +63,11 @@ echo ""
 echo "Writing DEV_DB_URL and PROD_DB_URL to .env file..."
 echo "" >> .env
 echo "# Database connection URLs, DEV is set to default, uncomment to test PROD" >> .env
-echo " ## DEV " >> .env
+echo " # DEV " >> .env
 echo "DATABASE_URL=$DEV_DB_URL" >> .env
 echo "NEXT_PUBLIC_BASE_URL=https://$DEV_DOMAIN" >> .env
 echo "" >> .env
-echo " ## PROD " >> .env
+echo " # PROD " >> .env
 echo "# DATABASE_URL=$PROD_DB_URL" >> .env
 echo "# NEXT_PUBLIC_BASE_URL=https://$PROD_DOMAIN" >> .env
 echo "" >> .env
