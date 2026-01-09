@@ -55,8 +55,25 @@ echo "Installing project dependencies..."
 pnpm install
 echo ""
 
-# Seed database with test data
+# Run database migrations
+./scripts/init/db.sh
+
+# Create sysadmin user for dev on this project
+# Create a pepper for password hashing and store it in .env
 echo ""
-echo "Seeding database with test data..."
-pnpm run seed
+echo "Creating pepper..."
+PEPPER=$(openssl rand -hex 32)
+echo "PASSWORD_HASH_SECRET=$PEPPER" >> .env
 echo ""
+
+# Set up system admin user
+echo ""
+echo "Setting up system admin user..."
+npx tsx ./scripts/init/sysadmin.ts
+echo ""
+
+echo "======================================================================="
+echo "================= PMF App Initialization Complete ====================="
+echo "======================================================================="
+echo ""
+echo "You can now start the development server with 'pnpm dev'"
