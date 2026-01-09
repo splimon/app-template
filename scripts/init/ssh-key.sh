@@ -2,8 +2,19 @@
 
 # Initializes SSH key for the application
 
+# Check for .env file and load environment variables
+if [ ! -f ".env" ]; then
+    echo ".env file not found! Please run the init script first to create it."
+    exit 1
+fi
+
 ENV_FILE=".env"
 export $(cat $ENV_FILE | grep -v '^#' | xargs)
+
+if [ -z "$PMF_DOKKU_HOST" ]; then
+    echo "PMF_DOKKU_HOST is not set in .env file! Please ask the PMF Builder admin for the correct host and add it to the .env file."
+    exit 1
+fi
 
 echo "Initializing SSH key..."
 
