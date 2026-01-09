@@ -17,6 +17,7 @@ echo ""
 echo "Creating .env file..."
 touch .env
 echo "PMF_DOKKU_HOST=$PMF_DOKKU_HOST" >> .env
+echo "" >> .env
 echo ""
 
 # Build Dokku Apps & Postgres Containers
