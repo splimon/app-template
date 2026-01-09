@@ -1,0 +1,4 @@
+{
+  "dialect": "postgres",
+  "outFile": "./lib/db/types.ts"
+}
