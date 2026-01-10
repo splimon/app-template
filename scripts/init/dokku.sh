@@ -10,7 +10,7 @@ ssh dokku@$PMF_DOKKU_HOST apps:list > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     echo "SSH access to Dokku host failed. Please ensure your SSH key is added to the Dokku server."
     echo "Contact PMF Builder Admin and run the ssh-key initialization script: "
-    echo "npm run init:ssh"
+    echo "pnpm run init:ssh"
     exit 1
 fi
 

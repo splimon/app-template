@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "init": "./scripts/init/index.sh",
+    "init:ssh": "./scripts/init/ssh-key.sh",
     "codegen": "kysely-codegen",
     "migrate:create": "./scripts/migrate/create.sh",
     "migrate:up": "./scripts/migrate/up.sh",
