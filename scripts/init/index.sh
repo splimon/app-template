@@ -25,6 +25,13 @@ echo ""
 echo "Building Dokku apps & postgres containers..."
 ./scripts/init/dokku.sh $APP_NAME
 
+# If dokku setup fails, exit script
+if [ $? -ne 0 ]; then
+    echo "Dokku setup failed. Exiting initialization."
+    exit 1
+fi
+echo ""
+
 # Verify Golang Migrate Installation
 echo "Verifying Golang Migrate installation..."
 if ! command -v migrate &> /dev/null
@@ -63,10 +70,12 @@ echo "PASSWORD_HASH_SECRET=$PEPPER" >> .env
 echo ""
 
 # Set up system admin user
-echo ""
 echo "Setting up system admin user..."
 tsx ./scripts/init/sysadmin.ts
 echo ""
+
+# Catch SIGINT to exit gracefully
+trap "echo 'Initialization interrupted! Exiting...'; exit 1" SIGINT
 
 echo "======================================================================="
 echo "================= PMF App Initialization Complete ====================="

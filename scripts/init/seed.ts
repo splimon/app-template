@@ -2,30 +2,32 @@ import { db } from "@/src/lib/db/kysely/client";
 import { randomUUID } from "crypto";
 import type { Insertable } from "kysely";
 import type { Orgs, Users, Members, Role } from "@/src/lib/db/types";
+import { hashPassword } from "@/src/lib/auth/password";
 
 const orgID = randomUUID() as string;
 const guestID = randomUUID() as string;
 const memberID = randomUUID() as string;
 const orgAdminID = randomUUID() as string;
+const passHash = await hashPassword("password123"); // Note: this does not follow our Zod schema for passwords, but is sufficient for test data
 
 const TEST_ACCOUNTS: Insertable<Users>[] = [
     {
         id: guestID,
         username: "John Doe",
         email: "john.doe@example.com",
-        password_hash: "password123",
+        password_hash: passHash,
     },
     {
         id: memberID,
         username: "Jane Smith",
         email: "jane.smith@example.com",
-        password_hash: "password123",
+        password_hash: passHash,
     },
     {
         id: orgAdminID,
         username: "Alice Johnson",
         email: "alice.johnson@example.com",
-        password_hash: "password123",
+        password_hash: passHash,
     }
 ];
 

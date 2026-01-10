@@ -63,12 +63,16 @@ echo ""
 echo "Writing DEV_DB_URL and PROD_DB_URL to .env file..."
 echo "" >> .env
 echo "# Database connection URLs, DEV is set to default, uncomment to test PROD" >> .env
-echo "# DEV " >> .env
 echo "DATABASE_URL=$DEV_DB_URL" >> .env
-echo "NEXT_PUBLIC_BASE_URL=https://$DEV_DOMAIN" >> .env
+echo "#DATABASE_URL=$PROD_DB_URL" >> .env
 echo "" >> .env
-echo "# PROD " >> .env
-echo "# DATABASE_URL=$PROD_DB_URL" >> .env
-echo "# NEXT_PUBLIC_BASE_URL=https://$PROD_DOMAIN" >> .env
+echo "# When you want to test different database environments on the application level, uncomment the corresponding database URLs below" >> .env
+echo "# Refer to src/lib/db/kysely/client.ts for how these are used" >> .env
+echo "DEV_URL=$DEV_DB_URL" >> .env
+echo "PROD_URL=$PROD_DB_URL" >> .env
+echo "" >> .env
+echo "# Application base URLs for DEV and PROD environments (locally is localhost:3000)" >> .env
+echo "#NEXT_PUBLIC_BASE_URL=https://$DEV_DOMAIN" >> .env
+echo "#NEXT_PUBLIC_BASE_URL=https://$PROD_DOMAIN" >> .env
 echo "" >> .env
 echo ""

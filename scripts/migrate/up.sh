@@ -28,6 +28,12 @@ case $ENV in
     export $(cat $ENV_FILE | grep -v '^#' | xargs)
     ;;
   prod)
+    if [ -n "$MIGRATION_COUNT" ]; then
+      echo "Note: In production, only running migration up without rollback test."
+      echo "Using local .env file to get PROD_URL."
+      ENV_FILE=".env"
+      export $(cat $ENV_FILE | grep -v '^#' | xargs)
+    fi
     ENV_FILE=".env.none"
     export PATH=../bin/:$PATH
     ;;
@@ -38,32 +44,35 @@ esac
 
 echo "Running migration cycle for $ENV environment..."
 
-# Run migration up
-echo ""
-if [ -z "$MIGRATION_COUNT" ]; then
-  echo "Running all pending migrations up..."
-  migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up
-else
-  echo "Running $MIGRATION_COUNT migration(s) up..."
-  migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up $MIGRATION_COUNT
-fi
-
 case $ENV in
   dev)
     echo ""
+    # Test migration
+    if [ -z "$MIGRATION_COUNT" ]; then
+      echo "Running migration up (all)..."
+      migrate -database "${DEV_URL}" -path src/lib/db/migrations up
+    else
+      echo "Running migration up ($MIGRATION_COUNT)..."
+      migrate -database "${DEV_URL}" -path src/lib/db/migrations up $MIGRATION_COUNT
+    fi
+
     # Test rollback
     echo ""
     echo "Testing rollback (down 1)..."
-    migrate -database "${DATABASE_URL}" -path src/lib/db/migrations down 1
+    migrate -database "${DEV_URL}" -path src/lib/db/migrations down 1
 
     # Run migration up again
     echo ""
+    echo "Running migration back up..."
+    migrate -database "${DEV_URL}" -path src/lib/db/migrations up 1
+    ;;
+  prod)
     if [ -z "$MIGRATION_COUNT" ]; then
-      echo "Running migration back up..."
-      migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up
-    else
-      echo "Running $MIGRATION_COUNT migration(s) back up..."
-      migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up $MIGRATION_COUNT
+      echo ""
+      migrate -database "${PROD_URL}" -path src/lib/db/migrations up
+    else 
+      echo ""
+      migrate -database "${PROD_URL}" -path src/lib/db/migrations up $MIGRATION_COUNT
     fi
     ;;
   *)

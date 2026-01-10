@@ -12,3 +12,14 @@ fi
 read -p "Enter your app name to remove it: " APP_NAME
 ./scripts/destroy/dokku.sh $APP_NAME
 echo ""
+
+# Remove .env file
+read -p "Do you want to remove the .env file as well? (y/n): " REMOVE_ENV
+if [ "$REMOVE_ENV" == "y" ] || [ "$REMOVE_ENV" == "Y" ]; then
+    rm -f .env
+    echo ".env file removed."
+else
+    echo ".env file retained."
+fi
+
+echo "Destruction process completed."
