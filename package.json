@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "eslint",
     "init": "./scripts/init/index.sh",
-    "destroy": "./scripts/destroy/index.sh",
     "codegen": "kysely-codegen",
     "migrate:create": "./scripts/migrate/create.sh",
     "migrate:up": "./scripts/migrate/up.sh",
