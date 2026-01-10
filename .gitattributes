@@ -1,0 +1,14 @@
+# Ensure shell scripts always use LF line endings (Unix-style)
+# This prevents CRLF issues that would break executability
+*.sh text eol=lf
+
+# TypeScript/JavaScript files
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+
+# Markdown files
+*.md text eol=lf
+
+# Configuration files
+.env* text eol=lf

@@ -52,5 +52,5 @@ echo ""
 
 # Seed database with test data
 echo "Seeding database with test data..."
-npx tsx ./scripts/init/seed.ts
+tsx ./scripts/init/seed.ts
 echo ""

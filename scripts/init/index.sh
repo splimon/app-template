@@ -7,6 +7,7 @@ echo "=================== PMF App Initialization ============================"
 echo "======================================================================="
 
 # Input new app name
+echo ""
 read -p "Enter your new app name (no spaces or special characters): " APP_NAME
 
 # Input PMF Remote Host
@@ -18,16 +19,13 @@ echo "Creating .env file..."
 touch .env
 echo "PMF_DOKKU_HOST=$PMF_DOKKU_HOST" >> .env
 echo "" >> .env
-echo ""
 
 # Build Dokku Apps & Postgres Containers
 echo ""
 echo "Building Dokku apps & postgres containers..."
 ./scripts/init/dokku.sh $APP_NAME
-echo ""
 
 # Verify Golang Migrate Installation
-echo ""
 echo "Verifying Golang Migrate installation..."
 if ! command -v migrate &> /dev/null
 then
@@ -50,7 +48,6 @@ fi
 echo ""
 
 # Install dependencies
-echo ""
 echo "Installing project dependencies..."
 pnpm install
 echo ""
@@ -60,7 +57,6 @@ echo ""
 
 # Create sysadmin user for dev on this project
 # Create a pepper for password hashing and store it in .env
-echo ""
 echo "Creating pepper..."
 PEPPER=$(openssl rand -hex 32)
 echo "PASSWORD_HASH_SECRET=$PEPPER" >> .env
@@ -69,7 +65,7 @@ echo ""
 # Set up system admin user
 echo ""
 echo "Setting up system admin user..."
-npx tsx ./scripts/init/sysadmin.ts
+tsx ./scripts/init/sysadmin.ts
 echo ""
 
 echo "======================================================================="
