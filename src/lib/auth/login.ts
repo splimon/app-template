@@ -1,8 +1,9 @@
 
-import * as argon2 from "argon2";
 import { db } from "../db/kysely/client";
 import { Errors } from "../errors";
 import { AuthUser, SessionType } from "@/src/types/auth";
+import { hash } from "crypto";
+import { hashPassword, verifyPassword } from "./password";
 
 export async function login(type: SessionType, identifier: string, password: string): Promise<AuthUser> {
     if (process.env.NODE_ENV === "development") console.log('[login] Attempting login for:', identifier, '|', password);
@@ -20,14 +21,13 @@ export async function login(type: SessionType, identifier: string, password: str
         throw Errors.INVALID_CREDENTIALS;
     }
 
-    console.log('[login] Account found:', account.id.slice(0, 6), '|', account.username);
+    console.log('[login] Account found:', account.id.slice(0, 6), '... |', account.username);
+    console.log('[login] Verifying password...');
 
     // Verify password
-    if (!(await argon2.verify(account.password_hash, password))) {
+    if (!(await verifyPassword(account.password_hash, password))) {
         throw Errors.INVALID_CREDENTIALS;
     }
-
-    console.log('[login] Password verified successfully.');
     
     return {
         ...account,

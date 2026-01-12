@@ -48,8 +48,6 @@ export function setSessionCookieInBrowser(response: NextResponse, rawToken: stri
         expires: expiresAt,
         path: "/"
     });
-    
-    console.log(`[edge-session] ${session_type} session cookie set in browser.`);
 
     return response;
 }

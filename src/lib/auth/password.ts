@@ -7,3 +7,10 @@ export async function hashPassword(password: string): Promise<string> {
             secret: Buffer.from(process.env.PASSWORD_HASH_SECRET || '', 'utf-8'),
         });    
 }
+
+export async function verifyPassword(storedHash: string, password: string): Promise<boolean> {
+    return argon2.verify(storedHash, password, 
+        { 
+            secret: Buffer.from(process.env.PASSWORD_HASH_SECRET || '', 'utf-8'),
+        });
+}
