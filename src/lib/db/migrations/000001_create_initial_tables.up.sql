@@ -23,10 +23,11 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS login_attempts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email TEXT NOT NULL,
-    ip_address INET NOT NULL,
+    identifier TEXT NOT NULL,
+    ip_address INET,
+    user_agent TEXT, 
     successful BOOLEAN NOT NULL,
     error_message TEXT,
-    attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    attempt_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

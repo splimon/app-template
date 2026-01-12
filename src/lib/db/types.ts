@@ -18,12 +18,13 @@ export type Sysrole = "sysadmin" | "user";
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface LoginAttempts {
-  attempt_time: Generated<Timestamp | null>;
-  email: string;
+  attempt_at: Generated<Timestamp | null>;
   error_message: string | null;
   id: Generated<string>;
-  ip_address: string;
+  identifier: string;
+  ip_address: string | null;
   successful: boolean;
+  user_agent: string | null;
 }
 
 export interface Members {

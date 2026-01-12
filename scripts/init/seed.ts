@@ -1,43 +1,44 @@
 import { db } from "@/src/lib/db/kysely/client";
 import { randomUUID } from "crypto";
-import type { Insertable } from "kysely";
-import type { Orgs, Users, Members, Role } from "@/src/lib/db/types";
 import { hashPassword } from "@/src/lib/auth/password";
+import { NewMember, NewOrg, NewUser } from "@/src/types/db";
+import { Role } from "@/src/lib/db/types";
 
 const orgID = randomUUID() as string;
 const guestID = randomUUID() as string;
 const memberID = randomUUID() as string;
 const orgAdminID = randomUUID() as string;
-const passHash = await hashPassword("password123"); // Note: this does not follow our Zod schema for passwords, but is sufficient for test data
+const password = 'password123!';
 
-const TEST_ACCOUNTS: Insertable<Users>[] = [
+const TEST_ACCOUNTS: NewUser[] = [
     {
         id: guestID,
-        username: "John Doe",
+        username: "jdoe",
         email: "john.doe@example.com",
-        password_hash: passHash,
+        password_hash: "",
     },
     {
         id: memberID,
-        username: "Jane Smith",
+        username: "jsmith",
         email: "jane.smith@example.com",
-        password_hash: passHash,
+        password_hash: "",
+
     },
     {
         id: orgAdminID,
-        username: "Alice Johnson",
+        username: "ajohnson",
         email: "alice.johnson@example.com",
-        password_hash: passHash,
+        password_hash: "",
     }
 ];
 
-const TEST_ORG: Insertable<Orgs> = {
+const TEST_ORG: NewOrg = {
     id: orgID,
     name: "Test Organization",
     slug: "test",
 };
 
-const MEMBERS: Insertable<Members>[] = [
+const MEMBERS: NewMember[] = [
     {
         id: randomUUID() as string,
         user_id: memberID,
@@ -53,33 +54,24 @@ const MEMBERS: Insertable<Members>[] = [
 ];
 
 async function seed() {
-    const introspector = db.introspection;
-    const tables = await introspector.getTables();
-    const tableNames = tables.map(table => table.name);
 
-    // Check if database has users table
-    if (!tableNames.includes("users")) {
-        console.error("Database does not have 'users' table. Please run migrations before seeding data.");
-        return;
-    } else {
-        // Insert test accounts
-        await db.insertInto("users").values(TEST_ACCOUNTS).execute();
+    // Hash passwords for test accounts
+    console.log("Hashing passwords for test accounts...");
+    for (const account of TEST_ACCOUNTS) {
+        account.password_hash = await hashPassword(password);
     }
-    
-    // Check if database has org & members table (dev can say no need)
-    if (!tableNames.includes("orgs") || !tableNames.includes("members")) {
-        console.warn("Database does not have 'orgs' or 'members' table. Skipping seeding this data.");
-    } else {
-        console.log("Seeding test organization and members...");
+
+    // Insert test accounts
+    console.log("Seeding test accounts...");
+    await db.insertInto("users").values(TEST_ACCOUNTS).execute();
         
-        // Insert test organization
-        await db.insertInto("orgs").values(TEST_ORG).execute();
+    // Insert test organization
+    console.log("Seeding test organization...");
+    await db.insertInto("orgs").values(TEST_ORG).execute();
 
-        // Insert members
-        await db.insertInto("members").values(MEMBERS).execute();
-    }
-
-    console.log("Test data seeded...");
+    // Insert members
+    console.log("Seeding organization members...");
+    await db.insertInto("members").values(MEMBERS).execute();    
 }
 
 seed().catch((error) => {
