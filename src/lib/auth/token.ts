@@ -15,8 +15,6 @@ export function hashToken(rawToken: string): string {
     return hashedToken;
 }
 
-
-
 // == DB Cookie Management Functions == 
 export async function storeTokenInDB(userId: string, hashedToken: string, expiresAt: Date): Promise<void> {
     const result = await db
