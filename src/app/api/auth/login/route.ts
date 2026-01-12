@@ -1,0 +1,83 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { login } from "@/src/lib/auth/login";
+import { createSession } from "@/src/lib/auth/session";
+// import { checkLoginRateLimit, getClientIP, getUserAgent, recordLoginAttempt } from "@/lib/auth/rate-limit";
+import { AppError } from "@/src/lib/errors";
+import { SessionType } from "@/src/types/auth";
+
+// Login input validation schema (linient on local dev)
+const loginSchema = z.object({
+  identifier: process.env.NODE_ENV === "production" ? z.string()
+    .min(1, { message: "Email or Username is required." })               
+    .refine((value) => { 
+        // Check if it's a valid email
+        const emailResult = z.email().safeParse(value);
+        if (emailResult.success) return true;
+        
+        // If not email, check if it's a valid username (3+ chars, alphanumeric + underscores)
+        const usernameRegex = /^[a-zA-Z0-9_]{3,}$/;
+        return usernameRegex.test(value);
+    }, {
+        message: "Please enter a valid email address or username (3+ characters, letters, numbers, and underscores only)."
+    })
+    : z.string().min(1, { message: "Email or Username is required." }),
+  password: z.string()
+    .min(1, { message: "Password is required." }),
+});
+
+export async function POST(request: NextRequest) {
+  console.log('[LOGIN] Login attempt received.');
+
+  // Extract metadata for login rate limiting
+//   const ip = getClientIP(request);
+//   const userAgent = getUserAgent(request);
+//   console.log('[LOGIN] Client IP:', ip, ' | User-Agent:', userAgent);
+
+  // Validate and safe parse input
+  const { type, credentials } = await request.json();
+  const parsed = loginSchema.safeParse(credentials);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid Input", issues: parsed.error.issues },
+      { status: 400 }
+    );
+  }
+
+  const { identifier, password } = parsed.data;
+  console.log('[LOGIN] Input validated:', type as SessionType);  
+
+  try {
+      // Check rate limit
+    //   await checkLoginRateLimit(ip, identifier);
+
+      // Login user/admin and generate response to be returned after setting cookie
+      const user = await login(type, identifier, password);
+
+      // Record successful login attempt
+    //   await recordLoginAttempt(ip, userAgent, identifier, true);
+
+      const res = NextResponse.json({ user }, { status: 200 });
+
+      const sessionSetResponse = await createSession(user.id, type, res);
+      
+      console.log('[LOGIN] Logged in successfully');
+      return sessionSetResponse;
+  } catch (error) {
+      if (error instanceof AppError) {
+            // Record failed login attempt        
+            // await recordLoginAttempt(ip, userAgent, identifier, false, error.message);
+            return NextResponse.json(
+                { error: error.message }, 
+                { status: error.statusCode }
+            );
+        }
+
+    console.error('[LOGIN]', error);
+    return NextResponse.json(
+        { error: 'Internal Server Error' }, 
+        { status: 500 }
+    );
+  }
+}   
