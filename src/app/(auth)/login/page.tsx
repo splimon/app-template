@@ -1,13 +1,14 @@
 'use client';
 
 import { LoginForm } from '@/src/components/LoginForm';
+import { SystemRole } from '@/src/types/db';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 function LoginPageContent() {
   const searchParams = useSearchParams();
-  const type = searchParams.get('type') as 'admin' | 'user' | null;
-  const loginType = type === 'admin' ? 'admin' : 'user';
+  const type = searchParams.get('type') as SystemRole | null;
+  const loginType = type === 'sysadmin' ? 'sysadmin' : 'user';
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black p-4">

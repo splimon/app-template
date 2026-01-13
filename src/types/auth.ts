@@ -1,23 +1,16 @@
-import { User } from "./db";
+import { SystemRole, User, UserRole } from "./db";
 
-export type SessionType = 'admin' | 'user';
+/**
+ * Interface data shape for an authenticated user (system admin, org admin, org member, org guest, or public user)
+ * - id
+ * - email
+ * - username
+ * - created_at
+ * - system_role ('sysadmin' | 'user')
+ * - role ('org_admin' | 'member' | 'guest' | null)
+ */
 export interface AuthUser extends Omit<User, 'password_hash'> {
-    type: SessionType
+    role: UserRole | null
 }
 
-
-// Admin can manage multiple orgs
-// export interface Admin extends User {
-//     orgs: Organization[]; // list of orgs the admin manages
-// }
-
-// // Regular user tied to a specific organization (member or a guest)
-// export interface Member extends Omit<Users, 'password_hash' | 'system_role' | 'created_at'> {
-//     org_id: string;
-//     role: UserRole;
-// }
-
-// // Organization with its members
-// export interface Organization extends Omit<Orgs, 'created_at'> {
-//     members: Member[];
-// };
+export type SessionType = SystemRole

@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { SystemRole } from '../types/db';
 
 interface LoginFormProps {
-  loginType: 'admin' | 'user';
+  loginType: SystemRole;
 }
 
 export function LoginForm({ loginType }: LoginFormProps) {
@@ -35,7 +36,7 @@ export function LoginForm({ loginType }: LoginFormProps) {
   return (
     <div className="w-full max-w-md p-8 bg-white dark:bg-zinc-900 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-center text-zinc-900 dark:text-zinc-50">
-        {loginType === 'admin' ? 'Admin Login' : 'User Login'}
+        {loginType === 'sysadmin' ? 'Admin Login' : 'User Login'}
       </h2>
 
       {error && (
@@ -94,14 +95,14 @@ export function LoginForm({ loginType }: LoginFormProps) {
 
       <div className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
         <p>
-          {loginType === 'admin'
+          {loginType === 'sysadmin'
             ? 'Switch to '
             : 'Switch to '}
           <a
-            href={loginType === 'admin' ? '/login?type=user' : '/login?type=admin'}
+            href={loginType === 'sysadmin' ? '/login?type=user' : '/login?type=admin'}
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
-            {loginType === 'admin' ? 'User Login' : 'Admin Login'}
+            {loginType === 'sysadmin' ? 'User Login' : 'Admin Login'}
           </a>
         </p>
       </div>

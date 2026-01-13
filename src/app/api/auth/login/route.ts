@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 //   console.log('[LOGIN] Client IP:', ip, ' | User-Agent:', userAgent);
 
   // Validate and safe parse input
-  const { type, credentials } = await request.json();
+  const { credentials } = await request.json();
   const parsed = loginSchema.safeParse(credentials);
 
   if (!parsed.success) {
@@ -46,21 +46,22 @@ export async function POST(request: NextRequest) {
   }
 
   const { identifier, password } = parsed.data;
-  console.log('[LOGIN] Input validated:', type as SessionType);  
 
   try {
       // Check rate limit
     //   await checkLoginRateLimit(ip, identifier);
 
       // Login user/admin and generate response to be returned after setting cookie
-      const user = await login(type, identifier, password);
+      const user = await login(identifier, password);
 
       // Record successful login attempt
     //   await recordLoginAttempt(ip, userAgent, identifier, true);
 
       const res = NextResponse.json({ user }, { status: 200 });
 
-      const sessionSetResponse = await createSession(user.id, type, res);
+      const sessionType = user.system_role
+
+      const sessionSetResponse = await createSession(user.id, sessionType, res);
       
       console.log('[LOGIN] Logged in successfully');
       return sessionSetResponse;
