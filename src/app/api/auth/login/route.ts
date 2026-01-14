@@ -49,13 +49,14 @@ export async function POST(request: NextRequest) {
 
   try {
       // Check rate limit
-    //   await checkLoginRateLimit(ip, identifier);
+      await checkLoginRateLimit(ip, identifier);
 
       // Login user/admin and generate response to be returned after setting cookie
       const user = await login(identifier, password);
 
-      // Record successful login attempt
-    //   await recordLoginAttempt(ip, userAgent, identifier, true);
+      // Clear failed attempts and record successful login
+      await clearFailedAttempts(ip, identifier);
+      await recordLoginAttempt(ip, userAgent, identifier, true);
 
       const res = NextResponse.json({ user }, { status: 200 });
 
@@ -67,17 +68,18 @@ export async function POST(request: NextRequest) {
       return sessionSetResponse;
   } catch (error) {
       if (error instanceof AppError) {
-            // Record failed login attempt        
-            // await recordLoginAttempt(ip, userAgent, identifier, false, error.message);
+            // Record failed login attempt
+            await recordLoginAttempt(ip, userAgent, identifier, false, error.message);
             return NextResponse.json(
-                { error: error.message }, 
+                { error: error.message },
                 { status: error.statusCode }
             );
         }
 
     console.error('[LOGIN]', error);
+    await recordLoginAttempt(ip, userAgent, identifier, false, 'Internal Server Error');
     return NextResponse.json(
-        { error: 'Internal Server Error' }, 
+        { error: 'Internal Server Error' },
         { status: 500 }
     );
   }
