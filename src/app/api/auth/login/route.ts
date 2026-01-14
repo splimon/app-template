@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { login } from "@/src/lib/auth/login";
 import { createSession } from "@/src/lib/auth/session";
-// import { checkLoginRateLimit, getClientIP, getUserAgent, recordLoginAttempt } from "@/lib/auth/rate-limit";
+import { checkLoginRateLimit, getClientIP, getUserAgent, recordLoginAttempt, clearFailedAttempts } from "@/src/lib/auth/rate-limit";
 import { AppError } from "@/src/lib/errors";
 import { SessionType } from "@/src/types/auth";
 
@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
   console.log('[LOGIN] Login attempt received.');
 
   // Extract metadata for login rate limiting
-//   const ip = getClientIP(request);
-//   const userAgent = getUserAgent(request);
-//   console.log('[LOGIN] Client IP:', ip, ' | User-Agent:', userAgent);
+  const ip = getClientIP(request);
+  const userAgent = getUserAgent(request);
+  console.log('[LOGIN] Client IP:', ip, ' | User-Agent:', userAgent);
 
   // Validate and safe parse input
   const { credentials } = await request.json();

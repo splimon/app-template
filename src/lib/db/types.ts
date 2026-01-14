@@ -35,6 +35,15 @@ export interface Members {
   user_role: Role;
 }
 
+export interface OauthAccounts {
+  created_at: Generated<Timestamp | null>;
+  email: string;
+  id: Generated<string>;
+  provider: string;
+  provider_user_id: string;
+  user_id: string;
+}
+
 export interface Orgs {
   created_at: Generated<Timestamp | null>;
   id: Generated<string>;
@@ -67,6 +76,7 @@ export interface Users {
 export interface DB {
   login_attempts: LoginAttempts;
   members: Members;
+  oauth_accounts: OauthAccounts;
   orgs: Orgs;
   schema_migrations: SchemaMigrations;
   sessions: Sessions;

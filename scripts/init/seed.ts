@@ -49,7 +49,7 @@ const MEMBERS: NewMember[] = [
         id: randomUUID() as string,
         user_id: orgAdminID,
         org_id: orgID,
-        user_role: "org_admin" as Role,
+        user_role: "admin" as Role,
     }
 ];
 

@@ -53,7 +53,7 @@ export async function fetchUserRole(userId: string): Promise<UserRole | null> {
 
     // User is public or something went wrong
     if (!roleResult) {
-        console.log(`[fetchUserRole] No role found in any organization for', ${userId.slice(0,6)}...`)
+        console.log(`[fetchUserRole] No role found in any organization for ${userId.slice(0,6)}...`)
         console.log('[fetchUserRole] Assuming user is public (no associated org)')
         return null
     }

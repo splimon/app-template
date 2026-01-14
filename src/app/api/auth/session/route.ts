@@ -6,9 +6,9 @@ export async function GET(request: NextRequest) {
   console.log('[SESSION] Session validation attempt received.');
 
   try {
-      const accountData = await validateSession(request);
-      console.log('[SESSION] Session validated successfully for account:', accountData);
-      return NextResponse.json(accountData, { status: 200 });
+      const user = await validateSession(request);
+      console.log('[SESSION] Session validated successfully for account:', user);
+      return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
       if (error instanceof AppError) {
         return NextResponse.json(
