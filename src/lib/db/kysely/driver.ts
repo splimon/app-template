@@ -16,6 +16,7 @@ const RETRYABLE_ERRORS = [
   'ETIMEDOUT',
   'ECONNRESET',
   'ECONNREFUSED',
+  'terminated',        // Add this - catches "Connection terminated unexpectedly"
   '57014', // query_canceled
   '08006', // connection_failure
   '08001', // unable_to_establish_connection
@@ -32,9 +33,21 @@ function isRetryable(error: unknown): boolean {
   return RETRYABLE_ERRORS.some((e) => str.includes(e.toLowerCase()));
 }
 
+function isConnectionError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const msg = error.message.toLowerCase();
+  return (
+    msg.includes('terminated') ||
+    msg.includes('etimedout') ||
+    msg.includes('econnreset') ||
+    msg.includes('not queryable')
+  );
+}
+
 class RetryConnection implements DatabaseConnection {
   constructor(
     private client: PoolClient,
+    private pool: Pool,  // Add pool reference
     private options: RetryOptions
   ) {}
 
@@ -66,6 +79,18 @@ class RetryConnection implements DatabaseConnection {
             `[DB Retry] Attempt ${attempt + 1}/${this.options.maxRetries} in ${delayMs}ms:`,
             (error as Error).message
           );
+
+          // If connection is broken, get a fresh one from the pool
+          if (isConnectionError(error)) {
+            try {
+              this.client.release(true); // Release as broken (removes from pool)
+            } catch {
+              // Ignore release errors on broken connections
+            }
+            this.client = await this.pool.connect();
+            console.log('[DB Retry] Acquired fresh connection');
+          }
+
           await delay(delayMs);
         }
       }
@@ -79,7 +104,11 @@ class RetryConnection implements DatabaseConnection {
   }
 
   release(): void {
-    this.client.release();
+    try {
+      this.client.release();
+    } catch {
+      // Connection might already be released/broken
+    }
   }
 }
 
@@ -100,8 +129,9 @@ export class RetryDriver implements Driver {
 
   async acquireConnection(): Promise<DatabaseConnection> {
     const client = await this.pool.connect();
-    return new RetryConnection(client, this.options);
+    return new RetryConnection(client, this.pool, this.options);  // Pass pool
   }
+
   async beginTransaction(conn: DatabaseConnection): Promise<void> {
     await conn.executeQuery(CompiledQuery.raw('BEGIN'));
   }
