@@ -36,7 +36,7 @@ export function LoginForm({ loginType }: LoginFormProps) {
   return (
     <div className="w-full max-w-md p-8 bg-white dark:bg-zinc-900 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-center text-zinc-900 dark:text-zinc-50">
-        {loginType === 'sysadmin' ? 'Admin Login' : 'User Login'}
+        {loginType === 'sysadmin' ? 'Internal Login' : 'User Login'}
       </h2>
 
       {error && (
@@ -99,10 +99,10 @@ export function LoginForm({ loginType }: LoginFormProps) {
             ? 'Switch to '
             : 'Switch to '}
           <a
-            href={loginType === 'sysadmin' ? '/login?type=user' : '/login?type=admin'}
+            href={loginType === 'sysadmin' ? '/login?type=user' : '/login?type=sysadmin'}
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
-            {loginType === 'sysadmin' ? 'User Login' : 'Admin Login'}
+            {loginType === 'sysadmin' ? 'User Login' : 'Internal Login'}
           </a>
         </p>
       </div>
