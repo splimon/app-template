@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { SystemRole } from '../types/db';
+import { SystemRole } from '../../../types/db';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
@@ -138,7 +138,15 @@ export function LoginForm({ loginType }: LoginFormProps) {
         )}
       </CardContent>
 
-      <CardFooter className="flex justify-center">
+      <CardFooter className="flex flex-col space-y-2">
+        {loginType === 'user' && (
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{' '}
+            <Button asChild variant="link" className="p-0 h-auto">
+              <Link href="/register">Create one</Link>
+            </Button>
+          </p>
+        )}
         <p className="text-sm text-muted-foreground">
           {loginType === 'sysadmin' ? 'Switch to ' : 'Switch to '}
           <Button asChild variant="link" className="p-0 h-auto">
