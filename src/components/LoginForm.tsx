@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { SystemRole } from '../types/db';
+import { Button } from '@/src/components/ui/button';
+import { Input } from '@/src/components/ui/input';
+import { Label } from '@/src/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/src/components/ui/card';
+import { Alert, AlertDescription } from '@/src/components/ui/alert';
+import Link from 'next/link';
 
 interface LoginFormProps {
   loginType: SystemRole;
@@ -34,78 +40,68 @@ export function LoginForm({ loginType }: LoginFormProps) {
   };
 
   return (
-    <div className="w-full max-w-md p-8 bg-white dark:bg-zinc-900 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center text-zinc-900 dark:text-zinc-50">
-        {loginType === 'sysadmin' ? 'Internal Login' : 'User Login'}
-      </h2>
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="text-2xl text-center">
+          {loginType === 'sysadmin' ? 'Internal Login' : 'User Login'}
+        </CardTitle>
+      </CardHeader>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded">
-          {error}
-        </div>
-      )}
+      <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="identifier"
-            className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-          >
-            Email or Username
-          </label>
-          <input
-            id="identifier"
-            type="text"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-            placeholder="Enter email or username"
-            required
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="identifier">Email or Username</Label>
+            <Input
+              id="identifier"
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Enter email or username"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <Button
+            type="submit"
             disabled={isLoading}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+            className="w-full"
+            size="lg"
           >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-            placeholder="Enter password"
-            required
-            disabled={isLoading}
-          />
-        </div>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </Button>
+        </form>
+      </CardContent>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-
-      <div className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        <p>
-          {loginType === 'sysadmin'
-            ? 'Switch to '
-            : 'Switch to '}
-          <a
-            href={loginType === 'sysadmin' ? '/login?type=user' : '/login?type=sysadmin'}
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            {loginType === 'sysadmin' ? 'User Login' : 'Internal Login'}
-          </a>
+      <CardFooter className="flex justify-center">
+        <p className="text-sm text-muted-foreground">
+          {loginType === 'sysadmin' ? 'Switch to ' : 'Switch to '}
+          <Button asChild variant="link" className="p-0 h-auto">
+            <Link href={loginType === 'sysadmin' ? '/login?type=user' : '/login?type=sysadmin'}>
+              {loginType === 'sysadmin' ? 'User Login' : 'Internal Login'}
+            </Link>
+          </Button>
         </p>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
