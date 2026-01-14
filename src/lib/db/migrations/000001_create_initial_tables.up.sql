@@ -2,7 +2,7 @@
 
 CREATE TYPE sysrole AS ENUM (
     'sysadmin',    -- can manage users and settings
-    'user'      -- regular user with standard permissions
+    'user'         -- regular user with standard permissions
 );
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

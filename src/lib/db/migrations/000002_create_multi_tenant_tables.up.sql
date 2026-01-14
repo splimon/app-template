@@ -9,15 +9,14 @@ CREATE TABLE IF NOT EXISTS orgs (
 
 -- Roles within an organization, can be expanded to include more roles as needed
 CREATE TYPE role AS ENUM (
-    'org_admin', -- can manage org settings and members
-    'member',    -- regular member with standard permissions
-    'guest'      -- limited access, read-only
+    'admin', -- can manage org settings and members
+    'member'     -- regular member with standard permissions
 );
 CREATE TABLE IF NOT EXISTS members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     org_id UUID REFERENCES orgs(id) ON DELETE CASCADE,
-    member_role role NOT NULL,
+    user_role role NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
