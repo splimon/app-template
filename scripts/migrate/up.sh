@@ -15,10 +15,8 @@ case $ENV_ARG in
     ENV="prod"
     ;;
   *)
-    echo "Error: Invalid environment specified"
-    echo "Usage: ./scripts/migrate.sh [d|dev|p|prod] [number]"
-    echo "  number: optional, number of migrations to run (default: all)"
-    exit 1
+    echo "No environment specified, defaulting to 'local'."
+    ENV="local"
     ;;
 esac
 
@@ -37,8 +35,9 @@ case $ENV in
     ENV_FILE=".env.none"
     export PATH=../bin/:$PATH
     ;;
-  *)
-    exit 1
+  local|*)
+    ENV_FILE=".env"
+    export $(cat $ENV_FILE | grep -v '^#' | xargs)
     ;;
 esac
 
@@ -75,8 +74,26 @@ case $ENV in
       migrate -database "${PROD_URL}" -path src/lib/db/migrations up $MIGRATION_COUNT
     fi
     ;;
-  *)
-    exit 1
+  local|*)
+    echo ""
+    # Test migration
+    if [ -z "$MIGRATION_COUNT" ]; then
+      echo "Running migration up (all)..."
+      migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up
+    else
+      echo "Running migration up ($MIGRATION_COUNT)..."
+      migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up $MIGRATION_COUNT
+    fi
+
+    # Test rollback
+    echo ""
+    echo "Testing rollback (down 1)..."
+    migrate -database "${DATABASE_URL}" -path src/lib/db/migrations down 1
+
+    # Run migration up again
+    echo ""
+    echo "Running migration back up..."
+    migrate -database "${DATABASE_URL}" -path src/lib/db/migrations up 1
     ;;
 esac
 
