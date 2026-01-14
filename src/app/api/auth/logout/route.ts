@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     try {
         // Invalidate session in backend (DB)
-        await invalidateSession(request);
+        const session = await invalidateSession(request);
 
         const redirectUrl = new URL('/', process.env.NEXT_PUBLIC_BASE_URL);
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
         // Delete session cookie in browser
         console.log('[LOGOUT] Deleting session cookie in browser...');
-        deleteSessionCookieInBrowser(res);
+        deleteSessionCookieInBrowser(session, res);
 
         console.log('[LOGOUT] User logged out successfully');
         return res;

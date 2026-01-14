@@ -18,10 +18,10 @@ export default function Home() {
     return <LandingPage />;
   }
 
-  // User is authenticated
   const isSysAdmin = user.system_role === 'sysadmin';
-  const isAdmin = user.role === 'org_admin';
+  const isAdmin = user.role === 'admin';
   const isMember = user.role === 'member';
+  const isGuest = user.role === null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -31,8 +31,9 @@ export default function Home() {
           <div className="w-full p-6 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-lg border border-blue-200 dark:border-blue-800">
             <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50 mb-2">
               {isSysAdmin ? '🔐 System Admin Dashboard' 
-              : isAdmin ? '🔐Admin Dashboard' 
-              : '👤 User Dashboard'}
+              : isAdmin ? '🔐 Organization Admin Dashboard' 
+              : isMember ? '👤 Organization Member Dashboard'
+              : '👥 Guest User Dashboard'}
             </h1>
             <p className="text-lg text-zinc-600 dark:text-zinc-400">
               Welcome back, <span className="font-semibold text-zinc-900 dark:text-zinc-100">{user.username}</span>!
@@ -60,11 +61,21 @@ export default function Home() {
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-200 dark:border-zinc-700">
                 <span className="text-zinc-600 dark:text-zinc-400">User Role:</span>
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">{user.role ? user.role : 'N/A (System Admins don\'t have a user role)'}</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">{user.role ? user.role : 'N/A'}
+                  {isSysAdmin && ' (System Admin does not have a user role)'}
+                  {isGuest && ' (Guest User has no assigned org-specific role)'}
+                  </span>                
               </div>
-              <div className="flex justify-between py-2">
+              <div className="flex justify-between py-2 border-b border-zinc-200 dark:border-zinc-700">
                 <span className="text-zinc-600 dark:text-zinc-400">User ID:</span>
                 <span className="font-mono text-xs text-zinc-700 dark:text-zinc-300">{user.id}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-zinc-600 dark:text-zinc-400">Organization:</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">{user.org ? user.org.name : 'N/A'}
+                  {isSysAdmin && ' (System Admin does not have an organization)'}
+                  {isGuest && ' (Guest User has no assigned organization)'}
+                </span>
               </div>
             </div>
           </div>
@@ -89,7 +100,7 @@ export default function Home() {
           {isAdmin && (
             <div className="w-full p-6 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
               <h2 className="text-xl font-semibold mb-2 text-purple-900 dark:text-purple-100">
-                Admin Capabilities
+                Organization Admin Capabilities
               </h2>
               <p className="text-purple-700 dark:text-purple-300 mb-4">
                 As an organization admin, you have access to:
@@ -106,16 +117,33 @@ export default function Home() {
           {isMember && (
             <div className="w-full p-6 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
               <h2 className="text-xl font-semibold mb-2 text-blue-900 dark:text-blue-100">
-                User Capabilities
+                Organization Member Capabilities
               </h2>
               <p className="text-blue-700 dark:text-blue-300 mb-4">
-                As a regular user, you have access to:
+                As a organization member, you have access to:
               </p>
               <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
                 <li>Your profile and settings</li>
                 <li>Organization membership</li>
                 <li>Standard platform features</li>
                 <li>Collaboration tools</li>
+                <li>Other organization-specific resources</li>
+              </ul>
+            </div>
+          )}
+
+          {isGuest && (
+            <div className="w-full p-6 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h2 className="text-xl font-semibold mb-2 text-blue-900 dark:text-blue-100">
+                Guest User Capabilities
+              </h2>
+              <p className="text-blue-700 dark:text-blue-300 mb-4">
+                As a guest user, your access is limited to:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+                <li>Viewing public information</li>
+                <li>Limited interaction with platform features</li>
+                <li>Access to specific resources as permitted by organization admins & system admins</li>
               </ul>
             </div>
           )}

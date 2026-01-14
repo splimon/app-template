@@ -11,7 +11,7 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
-export type Role = "guest" | "member" | "org_admin";
+export type Role = "admin" | "member";
 
 export type Sysrole = "sysadmin" | "user";
 
@@ -30,9 +30,9 @@ export interface LoginAttempts {
 export interface Members {
   created_at: Generated<Timestamp | null>;
   id: Generated<string>;
-  member_role: Role;
   org_id: string | null;
   user_id: string | null;
+  user_role: Role;
 }
 
 export interface Orgs {

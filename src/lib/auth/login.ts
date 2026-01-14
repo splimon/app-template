@@ -47,7 +47,7 @@ export async function fetchUserRole(userId: string): Promise<UserRole | null> {
 
     // Fetch user's role in an org (if any)
     const roleResult = await db.selectFrom('members')
-    .select('member_role')
+    .select('user_role')
     .where('user_id', '=', userId)
     .executeTakeFirst()
 
@@ -58,5 +58,5 @@ export async function fetchUserRole(userId: string): Promise<UserRole | null> {
         return null
     }
 
-    return roleResult.member_role
+    return roleResult.user_role
 }

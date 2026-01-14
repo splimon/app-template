@@ -1,4 +1,4 @@
-import { SystemRole, User, UserRole } from "./db";
+import { Org, SystemRole, User, UserRole } from "./db";
 
 /**
  * Interface data shape for an authenticated user (system admin, org admin, org member, org guest, or public user)
@@ -7,10 +7,16 @@ import { SystemRole, User, UserRole } from "./db";
  * - username
  * - created_at
  * - system_role ('sysadmin' | 'user')
- * - role ('org_admin' | 'member' | 'guest' | null)
+ * - role ('admin' | 'member' | null)
  */
 export interface AuthUser extends Omit<User, 'password_hash'> {
     role: UserRole | null
+    org?: Org 
 }
 
 export type SessionType = SystemRole
+
+export interface SessionCookie {
+    type: SessionType;
+    token: string;
+}

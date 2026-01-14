@@ -1,20 +1,31 @@
-import { SessionType } from '@/src/types/auth';
+import { SessionCookie, SessionType } from '@/src/types/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 const USER_COOKIE_NAME = 'session_token';
 const SYSADMIN_COOKIE_NAME = 'sysadmin_token'
 
+
 /**
- * Checks for existing tokens. Searches for a system admin cookie, then a user cookie, if neither exist, then returns null
+ * Searches browser for a system admin cookie, then a user cookie, if neither exist, then returns null
  * @param request NextRequest object
  * @returns existing session cookie token
  */
-export function getSessionTokenFromBrowser(request: NextRequest): string | null {
+export function getSessionCookieFromBrowser(request: NextRequest): SessionCookie | null {
     const sysAdminCookie = request.cookies.get(SYSADMIN_COOKIE_NAME)
-    if (sysAdminCookie) return sysAdminCookie.value;
+    if (sysAdminCookie) {
+        return {
+            type: 'sysadmin' as SessionType,
+            token: sysAdminCookie.value,
+        }
+    }
 
     const userCookie = request.cookies.get(USER_COOKIE_NAME)
-    if (userCookie) return userCookie.value
+    if (userCookie) {
+        return {
+            type: 'user' as SessionType,
+            token: userCookie.value,
+        }
+    }
 
     return null;
 }
