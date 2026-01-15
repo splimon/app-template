@@ -194,7 +194,7 @@ export default function GuestDashboard() {
       </Card>
 
       {/* Get Started */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+      <Card className="bg-linear-to-r from-blue-50 to-purple-50 border-blue-200">
         <CardHeader>
           <CardTitle>Ready to get started?</CardTitle>
           <CardDescription>

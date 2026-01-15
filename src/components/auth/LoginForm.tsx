@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { SystemRole } from '../../../types/db';
+import { SystemRole } from '../../types/db';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';

@@ -6,7 +6,7 @@
  */
 
 import { db } from "@/src/lib/db/kysely/client";
-import { RegisterForm } from "../_components/RegisterForm";
+import { RegisterForm } from "../../../components/auth/RegisterForm";
 
 /**
  * Fetch all organizations from the database

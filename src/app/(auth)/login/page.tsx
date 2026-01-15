@@ -1,6 +1,6 @@
 'use client';
 
-import { LoginForm } from '../_components/LoginForm';
+import { LoginForm } from '../../../components/auth/LoginForm';
 import { SystemRole } from '@/src/types/db';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';

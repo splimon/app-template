@@ -4,14 +4,18 @@ import { NextRequest, NextResponse } from 'next/server';
 const USER_COOKIE_NAME = 'session_token';
 const SYSADMIN_COOKIE_NAME = 'sysadmin_token'
 
+export type CookieStore = {
+    get: (name: string) => { value: string } | undefined;
+};
 
 /**
  * Searches browser for a system admin cookie, then a user cookie, if neither exist, then returns null
  * @param request NextRequest object
  * @returns existing session cookie token
  */
-export function getSessionCookieFromBrowser(request: NextRequest): SessionCookie | null {
-    const sysAdminCookie = request.cookies.get(SYSADMIN_COOKIE_NAME)
+export function getSessionCookieFromBrowser(requestOrCookies: NextRequest | CookieStore): SessionCookie | null {
+    const cookieStore = 'cookies' in requestOrCookies ? requestOrCookies.cookies : requestOrCookies;
+    const sysAdminCookie = cookieStore.get(SYSADMIN_COOKIE_NAME)
     if (sysAdminCookie) {
         return {
             type: 'sysadmin' as SessionType,
@@ -19,7 +23,7 @@ export function getSessionCookieFromBrowser(request: NextRequest): SessionCookie
         }
     }
 
-    const userCookie = request.cookies.get(USER_COOKIE_NAME)
+    const userCookie = cookieStore.get(USER_COOKIE_NAME)
     if (userCookie) {
         return {
             type: 'user' as SessionType,

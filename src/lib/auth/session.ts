@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthUser, SessionType } from '../../types/auth';
 import { deleteTokenInDB, generateToken, hashToken, storeTokenInDB } from './token';
-import { getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
+import { CookieStore, getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
 import { Errors } from '../errors';
 import { db } from '../db/kysely/client';
 import { fetchUserRole } from './login';
@@ -44,6 +44,33 @@ export async function createSession(userID: string, sessionType: SessionType, re
  */
 export async function validateSession(request: NextRequest): Promise<AuthUser> {
     const sessionCookie = getSessionCookieFromBrowser(request);
+    if (!sessionCookie) {
+        throw Errors.NO_SESSION;
+    }
+
+    const hashedToken = hashToken(sessionCookie.token);
+    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', sessionCookie.token);
+
+    // Fetch account data from session token
+    const account = await db.selectFrom('sessions as s')        
+        .innerJoin('users as u', 's.user_id', 'u.id')
+        .select(['u.id', 'u.email', 'u.username', 'u.system_role', 'u.created_at'])
+        .where('token_hash', '=', hashedToken)
+        .where('u.system_role', '=', sessionCookie.type)
+        .where('expires_at', '>', new Date())
+        .executeTakeFirst();
+    
+    if (!account) {
+        throw Errors.NO_SESSION;
+    }
+
+    const role = await fetchUserRole(account.id)
+
+    return { ...account, role } as AuthUser
+}
+
+export async function validateSessionFromCookies(cookieStore: CookieStore): Promise<AuthUser> {
+    const sessionCookie = getSessionCookieFromBrowser(cookieStore);
     if (!sessionCookie) {
         throw Errors.NO_SESSION;
     }

@@ -1,45 +1,31 @@
-'use client';
-
-import { useAuth } from "@/src/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { validateSessionFromCookies } from "@/src/lib/auth/session";
 
 /**
  * Dashboard Index Page
- * 
+ *
  * Redirects users to their appropriate role-based dashboard:
  * - /dashboard/sysadmin - System administrators
- * - /dashboard/admin - Organization administrators  
+ * - /dashboard/admin - Organization administrators
  * - /dashboard/member - Organization members
  * - /dashboard/guest - Guest users (no organization)
  */
-export default function DashboardPage() {
-  const { user, isLoading, isAuthenticated } = useAuth();
-  const router = useRouter();
+export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const user = await validateSessionFromCookies(cookieStore);
 
-  useEffect(() => {
-    if (isLoading) return;
+  if (user.system_role === "sysadmin") {
+    redirect("/dashboard/sysadmin");
+  }
 
-    if (!isAuthenticated || !user) {
-      router.replace('/login?type=user');
-      return;
-    }
+  if (user.role === "admin") {
+    redirect("/dashboard/admin");
+  }
 
-    // Determine dashboard based on role
-    if (user.system_role === 'sysadmin') {
-      router.replace('/dashboard/sysadmin');
-    } else if (user.role === 'admin') {
-      router.replace('/dashboard/admin');
-    } else if (user.role === 'member') {
-      router.replace('/dashboard/member');
-    } else {
-      router.replace('/dashboard/guest');
-    }
-  }, [user, isLoading, isAuthenticated, router]);
+  if (user.role === "member") {
+    redirect("/dashboard/member");
+  }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-lg text-muted-foreground">Redirecting to your dashboard...</div>
-    </div>
-  );
+  redirect("/dashboard/guest");
 }
