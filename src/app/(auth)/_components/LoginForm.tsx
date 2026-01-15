@@ -31,7 +31,7 @@ export function LoginForm({ loginType }: LoginFormProps) {
     const result = await login(loginType, identifier, password);
 
     if (result.success) {
-      router.push('/');
+      router.push('/dashboard');
     } else {
       setError(result.error || 'Login failed');
     }

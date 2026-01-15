@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { login } from "@/src/lib/auth/login";
+import { AppError } from "@/src/lib/errors";
 import { createSession } from "@/src/lib/auth/session";
 import { checkLoginRateLimit, getClientIP, getUserAgent, recordLoginAttempt, clearFailedAttempts } from "@/src/lib/auth/rate-limit";
-import { AppError } from "@/src/lib/errors";
-import { SessionType } from "@/src/types/auth";
 
 // Login input validation schema (linient on local dev)
 const loginSchema = z.object({

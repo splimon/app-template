@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AuthUser } from '../types/auth';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -21,6 +22,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   // Check for existing session on mount
   useEffect(() => {
@@ -38,6 +40,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
+        router.push('/dashboard');
+
       } else {
         setUser(null);
       }
@@ -70,7 +74,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const data = await response.json();
 
       if (response.ok && data.user) {
-        setUser(data.user);
+        setUser(data.user);        
         return { success: true };
       } else {
         return {
