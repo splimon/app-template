@@ -49,7 +49,7 @@ export async function validateSession(request: NextRequest): Promise<AuthUser> {
     }
 
     const hashedToken = hashToken(sessionCookie.token);
-    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', sessionCookie.token);
+    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', '[REDACTED]');
 
     // Fetch account data from session token
     const account = await db.selectFrom('sessions as s')        
@@ -76,7 +76,7 @@ export async function validateSessionFromCookies(cookieStore: CookieStore): Prom
     }
 
     const hashedToken = hashToken(sessionCookie.token);
-    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', sessionCookie.token);
+    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', '[REDACTED]');
 
     // Fetch account data from session token
     const account = await db.selectFrom('sessions as s')        

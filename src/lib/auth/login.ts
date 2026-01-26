@@ -5,7 +5,7 @@ import { verifyPassword } from "./password";
 import { UserRole } from "@/types/db";
 
 export async function login(identifier: string, password: string): Promise<AuthUser> {
-    if (process.env.NODE_ENV === "development") console.log('[login] Attempting login for:', identifier, '|', password);
+    if (process.env.NODE_ENV === "development") console.log('[login] Attempting login for:', identifier, '| [REDACTED]');
 
     // Fetch user by email or username
     const accountResult = await db.selectFrom('users')

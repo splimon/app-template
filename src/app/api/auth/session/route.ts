@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
   try {
       const user = await validateSession(request);
-      console.log('[SESSION] Session validated successfully for account:', user);
+      console.log('[SESSION] Session validated successfully for account:', user.id.slice(0, 6), '... | role:', user.role);
       return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
       if (error instanceof AppError) {

@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
         console.log("[oauth/callback] Received user info from Google:", {
             sub: googleUser.sub,
-            email: googleUser.email,
+            email: '[REDACTED]',
             name: googleUser.name,
         });
 
