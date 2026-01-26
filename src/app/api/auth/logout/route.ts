@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteSessionCookieInBrowser } from "@/src/lib/auth/browser";
-import { invalidateSession } from "@/src/lib/auth/session";
-import { AppError } from "@/src/lib/errors";
+import { deleteSessionCookieInBrowser } from "@/lib/auth/browser";
+import { invalidateSession } from "@/lib/auth/session";
+import { AppError } from "@/lib/errors";
 
 // NOTE: This is also accessed when user/admin clicks "Logout" in the UI
 export async function POST(request: NextRequest) {

@@ -1,8 +1,8 @@
-import { db } from "../db/kysely/client";
+import { db } from "../../db/kysely/client";
 import { Errors } from "../errors";
-import { AuthUser } from "@/src/types/auth";
+import { AuthUser } from "@/types/auth";
 import { verifyPassword } from "./password";
-import { UserRole } from "@/src/types/db";
+import { UserRole } from "@/types/db";
 
 export async function login(identifier: string, password: string): Promise<AuthUser> {
     if (process.env.NODE_ENV === "development") console.log('[login] Attempting login for:', identifier, '|', password);

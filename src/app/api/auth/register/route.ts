@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/src/lib/db/kysely/client";
-import { createSession } from "@/src/lib/auth/session";
-import { hashPassword } from "@/src/lib/auth/password";
+import { db } from "@/db/kysely/client";
+import { createSession } from "@/lib/auth/session";
+import { hashPassword } from "@/lib/auth/password";
 
 const registerSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),

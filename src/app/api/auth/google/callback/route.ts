@@ -19,11 +19,11 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { validateGoogleAuthorizationCode } from "@/src/lib/auth/oauth";
+import { validateGoogleAuthorizationCode } from "@/lib/auth/oauth";
 import { cookies } from "next/headers";
-import { db } from "@/src/lib/db/kysely/client";
-import { createSession } from "@/src/lib/auth/session";
-import { fetchUserRole } from "@/src/lib/auth/login";
+import { db } from "@/db/kysely/client";
+import { createSession } from "@/lib/auth/session";
+import { fetchUserRole } from "@/lib/auth/login";
 import { randomUUID } from "crypto";
 
 export async function GET(request: NextRequest) {

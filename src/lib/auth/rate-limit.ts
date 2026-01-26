@@ -1,4 +1,4 @@
-import { db } from "../db/kysely/client";
+import { db } from "../../db/kysely/client";
 import { NextRequest } from "next/server";
 
 /**

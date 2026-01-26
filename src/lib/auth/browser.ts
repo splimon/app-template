@@ -1,4 +1,4 @@
-import { SessionCookie, SessionType } from '@/src/types/auth';
+import { SessionCookie, SessionType } from '@/types/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 const USER_COOKIE_NAME = 'session_token';

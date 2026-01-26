@@ -1,6 +1,6 @@
 import type { Selectable, Insertable, Updateable } from 'kysely';
-import type { DB, Sysrole } from '../lib/db/types';
-import type { Role,  } from '../lib/db/types'
+import type { DB, Sysrole } from '../db/types';
+import type { Role,  } from '../db/types'
 
 // Custom Enums
 export type UserRole = Role;

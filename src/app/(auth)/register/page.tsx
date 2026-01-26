@@ -5,7 +5,7 @@
  * and passes them to the client-side RegisterForm component.
  */
 
-import { db } from "@/src/lib/db/kysely/client";
+import { db } from "@/db/kysely/client";
 import { RegisterForm } from "../../../components/auth/RegisterForm";
 
 /**

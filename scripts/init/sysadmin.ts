@@ -1,5 +1,5 @@
-import { db } from "@/src/lib/db/kysely/client";
-import { hashPassword } from "@/src/lib/auth/password";
+import { db } from "@/db/kysely/client";
+import { hashPassword } from "@/lib/auth/password";
 import * as readline from 'readline';
 import { z } from "zod";
 

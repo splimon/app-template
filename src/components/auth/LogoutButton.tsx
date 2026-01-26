@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "../ui/button";
 
 export default function LogoutButton() {

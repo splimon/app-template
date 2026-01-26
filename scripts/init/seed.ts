@@ -1,8 +1,8 @@
-import { db } from "@/src/lib/db/kysely/client";
+import { db } from "@/db/kysely/client";
 import { randomUUID } from "crypto";
-import { hashPassword } from "@/src/lib/auth/password";
-import { NewMember, NewOrg, NewUser } from "@/src/types/db";
-import { Role } from "@/src/lib/db/types";
+import { hashPassword } from "@/lib/auth/password";
+import { NewMember, NewOrg, NewUser } from "@/types/db";
+import { Role } from "@/db/types";
 
 const orgID = randomUUID() as string;
 const guestID = randomUUID() as string;

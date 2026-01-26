@@ -17,7 +17,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { generateState, generateCodeVerifier, getGoogleAuthorizationUrl } from "@/src/lib/auth/oauth";
+import { generateState, generateCodeVerifier, getGoogleAuthorizationUrl } from "@/lib/auth/oauth";
 import { cookies } from "next/headers";
 
 export async function GET() {
