@@ -16,10 +16,4 @@ export const Errors = {
 
   ADMIN_REQUIRED: new AppError('ADMIN_REQUIRED', 403, 'Unauthorized: Admin access required.'),
   UNAUTHORIZED: new AppError('UNAUTHORIZED', 401, 'Unauthorized access. Please log in.'),
-  CLIENTS_NOT_FOUND: new AppError('CLIENTS_NOT_FOUND', 404, 'No clients found.'), // shouldnt happen
-
-  REPORT_NOT_FOUND: new AppError('REPORT_NOT_FOUND', 404, 'No report found.'),
-  SITES_NOT_FOUND: new AppError('SITES_NOT_FOUND', 404, 'No sample sites found for the report.'),
-  METRICS_NOT_FOUND: new AppError('METRICS_NOT_FOUND', 404, 'No metrics found for the report.'),
-  RANGES_NOT_FOUND: new AppError('RANGES_NOT_FOUND', 404, 'No metric ranges found for the report.'),
 } as const;
