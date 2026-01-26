@@ -2,8 +2,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import { validateSessionFromCookies } from "@/src/lib/auth/session";
-import DashboardHeader from "./_components/DashboardHeader";
+import { validateSessionFromCookies } from "@/lib/auth/session";
+import DashboardHeader from "../../components/shared/DashboardHeader";
 
 interface DashboardLayoutProps {
   children: ReactNode;
