@@ -40,8 +40,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        router.push('/dashboard');
-
       } else {
         setUser(null);
       }
