@@ -12,6 +12,11 @@ export type AdminDashboardData = {
   pendingInvites: number;
 };
 
+/**
+ * Retrieves dashboard data for an admin user, including organization details, team member count, and pending invites.
+ * @param userId The ID of the admin user.
+ * @returns A promise that resolves to an AdminDashboardData object containing the organization (or null), team member count, and pending invites count.
+ */
 export async function fetchAdminDashboardData(userId: string): Promise<AdminDashboardData> {
   const orgMembership = await db
     .selectFrom("members as m")

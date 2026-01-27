@@ -5,7 +5,7 @@
  * Arctic handles the OAuth protocol details (authorization URLs, token exchange, etc.)
  * while we maintain control over user creation, account linking, and session management.
  *
- * Educational Notes for Interns:
+ * Educational Notes:
  * - OAuth 2.0 is an authorization framework that lets users grant limited access
  *   to their resources on one site to another site without sharing passwords
  * - The flow: Authorization Request → User Consent → Authorization Code → Token Exchange → Access Token
@@ -46,6 +46,10 @@ export { generateState };
  * 4. The server verifies the verifier matches the challenge
  *
  * This prevents authorization code interception attacks.
+ */
+/**
+ * Generates a cryptographically secure PKCE code verifier for OAuth.
+ * This function is re-exported from the Arctic library.
  */
 export { generateCodeVerifier };
 

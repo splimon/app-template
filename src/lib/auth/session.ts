@@ -15,11 +15,12 @@ function getExpirationDate(): Date {
 }
 
 /**
- * Creates session (stores hashed token in database and raw token in browser)
- * @param userID user that is requesting to be in session 
- * @param session_type type of session cookie to store (sysadmin or user)
- * @param response current response in the API
- * @returns new response including the new session cookie
+ * Creates a new user session.
+ * Generates a token, stores its hash in the database, and sets a session cookie in the browser.
+ * @param userID The ID of the user for whom the session is created.
+ * @param sessionType The type of session (e.g., 'user' or 'sysadmin').
+ * @param response The NextResponse object to which the session cookie will be attached.
+ * @returns A promise that resolves to the modified NextResponse containing the session cookie.
  */
 export async function createSession(userID: string, sessionType: SessionType, response: NextResponse): Promise<NextResponse<unknown>> {
     console.log('[session] Creating session for user:', userID.slice(0, 6), 'of type:', sessionType);
@@ -69,6 +70,13 @@ export async function validateSession(request: NextRequest): Promise<AuthUser> {
     return { ...account, role } as AuthUser
 }
 
+/**
+ * Validates a session using a provided CookieStore (e.g., server-side cookie object).
+ * This is similar to `validateSession` but operates on an explicit cookie store rather than a NextRequest.
+ * @param cookieStore The CookieStore containing session cookies.
+ * @returns A promise that resolves to an AuthUser if the session is valid.
+ * @throws Errors.NO_SESSION if the session cookie is missing or invalid.
+ */
 export async function validateSessionFromCookies(cookieStore: CookieStore): Promise<AuthUser> {
     const sessionCookie = getSessionCookieFromBrowser(cookieStore);
     if (!sessionCookie) {

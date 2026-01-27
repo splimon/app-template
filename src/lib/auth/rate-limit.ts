@@ -5,6 +5,10 @@ import { NextRequest } from "next/server";
  * Extract client IP address from request headers
  * Checks common proxy headers in order of reliability
  */
+/**
+ * Extract client IP address from request headers
+ * Checks common proxy headers in order of reliability
+ */
 export function getClientIP(request: NextRequest): string | null {
   
     // Cloudflare
@@ -26,10 +30,23 @@ export function getClientIP(request: NextRequest): string | null {
     return null;
 }
 
+/**
+ * Retrieves the User-Agent header from the request.
+ * @param request The incoming NextRequest.
+ * @returns The User-Agent string if present, otherwise null.
+ */
 export function getUserAgent(request: NextRequest): string | null {
   return request.headers.get('user-agent');
 }
 
+/**
+ * Records a login attempt in the database.
+ * @param ip The IP address of the client (may be null).
+ * @param userAgent The User-Agent string of the client (may be null).
+ * @param identifier The user identifier (e.g., email or username) used for the login attempt.
+ * @param success Whether the login attempt was successful.
+ * @param error Optional error message if the attempt failed.
+ */
 export async function recordLoginAttempt(ip: string | null, userAgent: string | null, identifier: string, success: boolean, error?: string, ): Promise<void> {
     const result = await db.insertInto('login_attempts')
         .values({
@@ -46,6 +63,12 @@ export async function recordLoginAttempt(ip: string | null, userAgent: string | 
     }
 }
 
+/**
+ * Checks if the number of failed login attempts exceeds the allowed limit.
+ * @param ip The client IP address (may be null).
+ * @param identifier The user identifier (e.g., email or username).
+ * @throws Error with code 'TOO_MANY_REQUESTS' if the limit is exceeded.
+ */
 export async function checkLoginRateLimit(ip: string | null, identifier: string): Promise<void> {
     const MAX_ATTEMPTS = 5;
     const WINDOW_MINUTES = 15;
@@ -75,6 +98,11 @@ export async function checkLoginRateLimit(ip: string | null, identifier: string)
     }
 }
 
+/**
+ * Clears all failed login attempt records for a given IP and identifier.
+ * @param ip The client IP address (may be null).
+ * @param identifier The user identifier (e.g., email or username).
+ */
 export async function clearFailedAttempts(ip: string | null, identifier: string): Promise<void> {
     const result = await db.deleteFrom('login_attempts')
         .where('successful', '=', false)

@@ -11,6 +11,11 @@ export type MemberDashboardData = {
   teamMemberCount: number;
 };
 
+/**
+ * Retrieves dashboard data for a member user, including organization details and team member count.
+ * @param userId The ID of the user whose dashboard data is being fetched.
+ * @returns A promise that resolves to a MemberDashboardData object containing the organization (or null) and the number of team members.
+ */
 export async function fetchMemberDashboardData(userId: string): Promise<MemberDashboardData> {
   const orgMembership = await db
     .selectFrom("members as m")
