@@ -1,7 +1,7 @@
 # Intern Assignment: Codebase Optimization & Security Enhancements
 
 ## Overview
-We want you to get familiar with the **PMF app‑template** codebase and improve it by addressing performance, security, and maintainability concerns. You will use a **coding agent** (Claude Code) to explore the repository, identify problem areas, and implement the required changes.
+We want you to get familiar with the **PMF app‑template** codebase and improve it by addressing performance, security, and maintainability concerns. You will use a **coding agent** (Claude Code) to explore the repository, identify problem areas, and implement the required changes. For these tasks, do not use [SpecKit](https://github.com/github/spec-kit), instead figure out the root cause or fix you need to do and have the Agent implement the code. SpecKit should be used for new features & enhancements. 
 
 ---
 
