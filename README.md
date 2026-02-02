@@ -1,6 +1,6 @@
 # PMF App Template
 
-A full-stack [Next.js](https://nextjs.org) application template with authentication, database migrations, and automated Dokku deployment.
+A full-stack [Next.js](https://nextjs.org) application template with authentication, database migrations, and automated Dokku deployment. 
 
 ## Quick Start
 
