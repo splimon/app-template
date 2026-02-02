@@ -7,7 +7,8 @@ import SysAdminDashboardClient from "./SysAdminDashboardClient";
 export default async function SysAdminDashboard() {
   let user;
   try {
-    user = await validateSessionFromCookies(cookies());
+    const cookieStore = await cookies();
+    user = await validateSessionFromCookies(cookieStore);
   } catch {
     redirect("/login?type=sysadmin");
   }

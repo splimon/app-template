@@ -34,32 +34,81 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) to see your application.
 
-## Project Structure
+## Repository Structure
 
 ```
 .
 ├── scripts/
-│   ├── init/          # Project initialization scripts
-│   ├── migrate/       # Database migration scripts
-│   └── destroy/       # Cleanup scripts
+│   ├── init/              # Project initialization scripts
+│   ├── migrate/           # Database migration scripts
+│   └── destroy/           # Cleanup scripts
 ├── src/
-│   ├── app/           # Next.js app directory
-│   ├── lib/
-│   │   ├── auth/      # Authentication utilities
-│   │   └── db/        # Database client and migrations
-│   └── ...
+│   ├── app/               # Next.js pages, layouts, middleware, server actions
+│   │   └── api/           # API routes (auth, OAuth callbacks)
+│   ├── components/        # Reusable UI components
+│   │   ├── ui/            # Shadcn UI primitives (buttons, dialogs, etc.)
+│   │   ├── shared/        # App-specific shared components
+│   │   └── auth/          # Authentication UI components
+│   ├── db/                # Database layer (Kysely client, migrations, types)
+│   ├── hooks/             # Custom React hooks and context providers
+│   ├── lib/               # Core utilities (auth, errors, helpers)
+│   ├── services/          # Business logic services (data access, CRUD)
+│   └── types/             # TypeScript type definitions
+├── .env                   # Environment variables (never commit)
+├── package.json
 └── ...
 ```
 
-## Scripts Documentation
+Each layer in `src/` has its own README explaining its purpose and conventions:
 
-This template includes automated scripts for managing your application lifecycle:
+| Directory | README | Description |
+|-----------|--------|-------------|
+| `src/app/` | [README](src/app/README.md) | Next.js pages, layouts, and server actions |
+| `src/app/api/` | [README](src/app/api/README.md) | API routes (auth only — use server actions for CRUD) |
+| `src/components/` | [README](src/components/README.md) | Reusable UI building blocks |
+| `src/db/` | [README](src/db/README.md) | Database client, migrations, and generated types |
+| `src/hooks/` | [README](src/hooks/README.md) | Custom React hooks and context providers |
+| `src/lib/` | [README](src/lib/README.md) | Core utilities and auth helpers |
+| `src/services/` | [README](src/services/README.md) | Business logic and data access |
+| `src/types/` | [README](src/types/README.md) | Shared TypeScript interfaces and types |
 
-- **[scripts/init/README.md](scripts/init/README.md)** - Complete project initialization guide
-- **[scripts/migrate/README.md](scripts/migrate/README.md)** - Database migration management
-- **[scripts/destroy/README.md](scripts/destroy/README.md)** - Application cleanup and removal
+Script documentation:
 
-## Common Tasks
+- [scripts/init/README.md](scripts/init/README.md) — Project initialization
+- [scripts/migrate/README.md](scripts/migrate/README.md) — Database migration management
+- [scripts/destroy/README.md](scripts/destroy/README.md) — Application cleanup and removal
+
+## Development Workflow
+
+### Local Development
+
+1. Create a feature branch or work on a local branch:
+   ```bash
+   git checkout -b feature/my-feature
+   ```
+2. Make your changes and test locally with `pnpm dev`
+3. Create database migrations if needed (`pnpm migrate:create <name>`)
+4. Commit your changes
+
+### Deploying to Dev
+
+Push your branch to the **dev** environment for testing:
+
+```bash
+git push dokku-dev my-branch:master
+```
+
+Test on the dev environment to verify everything works as expected.
+
+### Deploying to Production
+
+Once changes are validated on dev, push to **production**:
+
+```bash
+git push dokku main:master
+```
+
+Database migrations run automatically during deployment via the predeploy hook in `app.json`.
 
 ### Database Migrations
 
@@ -68,27 +117,27 @@ Create a new migration:
 pnpm migrate:create <migration_name>
 ```
 
-Run migrations (development):
+Run migrations against dev:
 ```bash
 pnpm migrate:up d
 ```
 
+Run migrations against prod:
+```bash
+pnpm migrate:up p
+```
+
 See [scripts/migrate/README.md](scripts/migrate/README.md) for detailed migration workflows.
-
-### Development Workflow
-
-1. Make your changes
-2. Create database migrations if needed
-3. Test locally with `pnpm dev`
-4. Commit your changes
-5. Deploy to Dokku (handled automatically via git push)
 
 ## Technology Stack
 
 - **Framework:** [Next.js](https://nextjs.org) 15 with App Router
 - **Language:** TypeScript
 - **Database:** PostgreSQL with [Kysely](https://kysely.dev) query builder
-- **Authentication:** Custom auth with secure password hashing
+- **UI Components:** [Shadcn UI](https://ui.shadcn.com) + [Radix UI](https://www.radix-ui.com)
+- **Styling:** Tailwind CSS
+- **Authentication:** Custom auth with secure password hashing (argon2) + Google OAuth
+- **Validation:** Zod
 - **Migrations:** [golang-migrate](https://github.com/golang-migrate/migrate)
 - **Deployment:** [Dokku](https://dokku.com) (PaaS)
 - **Package Manager:** pnpm
@@ -97,29 +146,15 @@ See [scripts/migrate/README.md](scripts/migrate/README.md) for detailed migratio
 
 After initialization, your `.env` file will contain:
 
-- `PMF_DOKKU_HOST` - Your Dokku host address
-- `DATABASE_URL` - Active database connection URL
-- `DEV_URL` - Development database URL
-- `PROD_URL` - Production database URL
-- `PASSWORD_HASH_SECRET` - Pepper for password hashing
+- `PMF_DOKKU_HOST` — Your Dokku host address
+- `DATABASE_URL` — Active database connection URL
+- `DEV_URL` — Development database URL
+- `PROD_URL` — Production database URL
+- `PASSWORD_HASH_SECRET` — Pepper for password hashing
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — OAuth credentials
+- `NEXT_PUBLIC_BASE_URL` — Application base URL
 
 **Never commit the `.env` file to version control.**
-
-## Deployment
-
-### Development Environment
-
-```bash
-git push dokku-dev main:master
-```
-
-### Production Environment
-
-```bash
-git push dokku main:master
-```
-
-Database migrations run automatically during deployment via the predeploy hook defined in `app.json`.
 
 ## Need Help?
 
@@ -127,17 +162,5 @@ Database migrations run automatically during deployment via the predeploy hook d
 - **Migration problems?** See [scripts/migrate/README.md](scripts/migrate/README.md)
 - **Want to start over?** See [scripts/destroy/README.md](scripts/destroy/README.md)
 - **Next.js questions?** Check the [Next.js Documentation](https://nextjs.org/docs)
-
-## Learn More
-
-### Next.js Resources
-
-- [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API
-- [Learn Next.js](https://nextjs.org/learn) - Interactive Next.js tutorial
-- [Next.js GitHub](https://github.com/vercel/next.js)
-
-### Other Resources
-
-- [Kysely Documentation](https://kysely.dev) - Type-safe SQL query builder
-- [Dokku Documentation](https://dokku.com/docs) - Self-hosted PaaS
-- [golang-migrate](https://github.com/golang-migrate/migrate) - Database migrations
+- **Kysely questions?** Check the [Kysely Documentation](https://kysely.dev)
+- **Dokku questions?** Check the [Dokku Documentation](https://dokku.com/docs)

@@ -7,7 +7,8 @@ import MemberDashboardClient from "./MemberDashboardClient";
 export default async function MemberDashboard() {
   let user;
   try {
-    user = await validateSessionFromCookies(cookies());
+    const cookieStore = await cookies();
+    user = await validateSessionFromCookies(cookieStore);
   } catch {
     redirect("/login?type=user");
   }
