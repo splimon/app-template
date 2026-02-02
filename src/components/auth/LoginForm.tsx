@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { SystemRole } from '../../types/db';
 import { Button } from '@/components/ui/button';

@@ -69,6 +69,13 @@ PEPPER=$(openssl rand -hex 32)
 echo "PASSWORD_HASH_SECRET=$PEPPER" >> .env
 echo ""
 
+# Insert Google OAuth credentials placeholders in .env
+echo "Inserting Google OAuth credentials placeholders in .env..."
+echo "GOOGLE_CLIENT_ID=your_google_client_id_here" >> .env
+echo "GOOGLE_CLIENT_SECRET=your_google_client_secret_here" >> .env
+echo "GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback" >> .env
+echo ""
+
 # Set up system admin user
 echo "Setting up system admin user..."
 tsx ./scripts/init/sysadmin.ts

@@ -16,7 +16,7 @@ pnpm migrate:up d 1
 pnpm migrate:up p 1
 echo ""
 
-# Ask if users wants multi-tenancy migration (orgs & members)
+# Run multi-tenancy migration (orgs & members)
 echo ""
 echo "The next migration will set up multi-tenancy data tables."
 echo "This will create the following data tables in your schema:"

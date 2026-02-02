@@ -13,6 +13,13 @@ read -p "Enter your app name to remove it: " APP_NAME
 ./scripts/destroy/dokku.sh $APP_NAME
 echo ""
 
+# Rename app name back to <APP_NAME> for CI/CD workflows
+echo "Renaming app name back to <APP_NAME> in CI/CD workflow files..."
+DEV_WORKFLOW_FILE=".github/workflows/deploy-dev.yml"
+PROD_WORKFLOW_FILE=".github/workflows/deploy.yml"
+sed -i '' "s|$APP_NAME-dev|<APP_NAME>|g" $DEV_WORKFLOW_FILE
+sed -i '' "s|$APP_NAME|<APP_NAME>|g" $PROD_WORKFLOW_FILE
+
 # Remove .env file
 read -p "Do you want to remove the .env file as well? (y/n): " REMOVE_ENV
 if [ "$REMOVE_ENV" == "y" ] || [ "$REMOVE_ENV" == "Y" ]; then
