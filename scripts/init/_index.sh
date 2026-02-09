@@ -20,7 +20,7 @@ echo "" >> .env
 
 # Check for SSH access to Dokku host
 echo "Verifying SSH access to Dokku host..."
-ssh dokku@$PMF_DOKKU_HOST dokku apps:list > /dev/null 2>&1
+ssh dokku@$PMF_DOKKU_HOST apps:list > /dev/null 2>&1
 if [ $? -ne 0 ];
 then
     echo "SSH access to Dokku host failed. Please ensure your SSH key is added to the Dokku server."
@@ -29,7 +29,7 @@ then
     echo "pnpm run init:ssh"
     echo ""
     echo "Then contact PMF Builder Admin after running the script."
-    exit 1
+    exit 1 
 fi
 echo "SSH access to Dokku host verified successfully!"
 

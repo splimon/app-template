@@ -1,19 +1,36 @@
-import '@testing-library/jest-dom'
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '../utils';
 import { LoginForm } from '@/components/auth/LoginForm';
-import { AuthProvider } from '@/hooks/contexts/AuthContext';
-
-const TestWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <AuthProvider>{children}</AuthProvider>;
-};
 
 describe('LoginForm', () => {
+    beforeEach(() => {
+        global.fetch = jest.fn();
+    });
 
-    it('renders login form with System Administrator text', () => {
-        render(<LoginForm loginType="sysadmin" />, { wrapper: TestWrapper });
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
 
-        // card title should be Internal Login for sysadmin login
-        expect(screen.getByText(/Internal Login/i)).toBeInTheDocument();
-    });    
-    
+    test('renders login form with correct fields', () => {
+        render(<LoginForm loginType="user" />);
+
+        expect(screen.getByLabelText(/Email or Username/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Login/i })).toBeInTheDocument();
+    });
+
+    test('displays error message on failed login', async () => {
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ error: 'Invalid credentials' }),
+        });
+
+        render(<LoginForm loginType="user" />);
+
+        fireEvent.change(screen.getByLabelText(/Email or Username/i), { target: { value: 'wronguser' } });
+        fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'wrongpassword' } });
+        fireEvent.click(screen.getByRole('button', { name: /Login/i }));
+
+        const errorMessage = await screen.findByText(/Invalid credentials. Please try again./i);
+        expect(errorMessage).toBeInTheDocument();
+    });
 })
