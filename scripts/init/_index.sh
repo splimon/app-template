@@ -6,11 +6,9 @@ echo "======================================================================="
 echo "=================== PMF App Initialization ============================"
 echo "======================================================================="
 
-# Input new app name
+# Get Inputs
 echo ""
 read -p "Enter your new app name (no spaces or special characters): " APP_NAME
-
-# Input PMF Remote Host
 read -p "Enter the PMF Dokku Host (get from PMF Builder Admin): " PMF_DOKKU_HOST
 
 # Create .env file
@@ -80,7 +78,6 @@ if [ $? -ne 0 ]; then
 fi
 echo ""
 
-# Create sysadmin user for dev on this project
 # Create a pepper for password hashing and store it in .env
 echo "Creating pepper..."
 PEPPER=$(openssl rand -hex 32)
@@ -97,6 +94,20 @@ echo ""
 # Set up system admin user
 echo "Setting up system admin user..."
 tsx ./scripts/init/helpers/sysadmin.ts
+echo ""
+
+# Seed database with test data
+echo "Seeding database with test data..."
+tsx ./scripts/init/helpers/seed.ts
+echo ""
+
+# Create GitHub workflows for Dokku deployment
+echo "Creating GitHub workflows for Dokku deployment..."
+./scripts/init/helpers/cicd.sh $PMF_DOKKU_HOST $APP_NAME
+if [ $? -ne 0 ]; then
+    echo "GitHub workflow setup failed. Exiting initialization."
+    exit 1
+fi
 echo ""
 
 # Catch SIGINT to exit gracefully
