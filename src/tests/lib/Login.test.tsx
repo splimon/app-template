@@ -1,15 +1,8 @@
-/**
- * Integration tests for the login API route
- * Tests the complete login flow with real database queries
- *
- * @jest-environment node
- */
-
 import { POST } from '@/app/api/auth/login/route';
 import { NextRequest } from 'next/server';
 import { db } from '@/db/kysely/client';
 import { hashPassword } from '@/lib/auth/password';
-import { Errors } from '../errors';
+import { Errors } from '../../lib/errors';
 import { randomUUID } from 'crypto';
 
 // Helper to create a properly typed mock NextRequest

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { login } from "@/lib/auth/login";
-import { AppError } from "@/tests/errors";
+import { AppError } from "@/lib/errors";
 import { createSession } from "@/lib/auth/session";
 import { checkLoginRateLimit, getClientIP, getUserAgent, recordLoginAttempt, clearFailedAttempts } from "@/lib/auth/rate-limit";
 

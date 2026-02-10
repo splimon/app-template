@@ -1,4 +1,4 @@
-import { Errors } from "@/tests/errors";
+import { Errors } from "@/lib/errors";
 import { db } from "@/db/kysely/client";
 import { NextRequest } from "next/server";
 

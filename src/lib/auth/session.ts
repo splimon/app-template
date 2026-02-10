@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AuthUser, SessionType } from '../../types/auth';
 import { deleteTokenInDB, generateToken, hashToken, storeTokenInDB } from './token';
 import { CookieStore, getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
-import { Errors } from '../../tests/errors';
+import { Errors } from '../errors';
 import { db } from '../../db/kysely/client';
 import { fetchUserRole } from './login';
 
@@ -42,6 +42,7 @@ export async function createSession(userID: string, sessionType: SessionType, re
  * Gets the raw token from browser cookies, then finds the hashed version in the DB )
  * @param request NextRequest object
  * @returns AuthUser (all user data needed for application)
+ * @throws Errors.NO_SESSION if the session cookie is missing or invalid
  */
 export async function validateSession(request: NextRequest): Promise<AuthUser> {
     const sessionCookie = getSessionCookieFromBrowser(request);
