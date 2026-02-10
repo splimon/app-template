@@ -2,8 +2,39 @@ import { POST } from '@/app/api/auth/login/route';
 import { NextRequest } from 'next/server';
 import { db } from '@/db/kysely/client';
 import { hashPassword } from '@/lib/auth/password';
-import { Errors } from '../../lib/errors';
+import { Errors } from '../../../lib/errors';
 import { randomUUID } from 'crypto';
+
+/*
+1. Test successful login:
+    - Create a test user in the database.
+    - Mock a NextRequest with correct credentials.
+    - Call the POST function and expect a 200 response with user data and session cookie.
+
+2. Test failed login with incorrect password:
+    - Mock a NextRequest with correct email but wrong password.
+    - Call the POST function and expect a 401 response with INVALID_CREDENTIALS error.
+
+3. Test failed login with non-existent email or username:
+    - Mock a NextRequest with an email that doesn't exist in the database.
+    - Call the POST function and expect a 401 response with INVALID_CREDENTIALS error.
+
+4. Test input validation:
+    - Mock NextRequests with various invalid inputs (empty identifier, empty password, missing fields).
+    - Call the POST function and expect a 400 response with Invalid Input error.
+
+5. Test rate limiting:
+    - Mock multiple failed login attempts from the same IP and identifier.
+    - After 5 failed attempts, call the POST function again and expect a 429 response with TOO_MANY_REQUESTS error.
+
+6. Test request headers:
+    - Mock a NextRequest with custom x-forwarded-for and user-agent headers.
+    - Call the POST function and verify that the login attempt is recorded with the correct IP and user agent in the database.
+
+7. Test session creation:
+    - Mock a NextRequest with correct credentials.
+    - Call the POST function and verify that a session cookie is set with the correct attributes (HttpOnly, SameSite, Secure in production).
+*/
 
 // Helper to create a properly typed mock NextRequest
 function createMockRequest(
@@ -45,7 +76,7 @@ const testAdmin = {
   system_role: 'sysadmin' as const,
 };
 
-describe('Login API Integration Tests', () => {
+describe('Login Tests', () => {
   // Setup: Create test users before all tests
   beforeAll(async () => {
     const userPasswordHash = await hashPassword(testUser.password);

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import type { SysAdminDashboardData } from "@/services/data/sysadmin";
+import type { SysAdminDashboardData } from "@/lib/data/sysadmin";
 
 const formatCount = (value: number) => value.toLocaleString();
 
