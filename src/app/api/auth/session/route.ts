@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateSession } from '@/lib/auth/session';
-import { AppError } from '@/lib/errors';
+import { AppError } from '@/tests/errors';
 
 export async function GET(request: NextRequest) {
   console.log('[SESSION] Session validation attempt received.');

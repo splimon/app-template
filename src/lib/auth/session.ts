@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AuthUser, SessionType } from '../../types/auth';
 import { deleteTokenInDB, generateToken, hashToken, storeTokenInDB } from './token';
 import { CookieStore, getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
-import { Errors } from '../errors';
+import { Errors } from '../../tests/errors';
 import { db } from '../../db/kysely/client';
 import { fetchUserRole } from './login';
 

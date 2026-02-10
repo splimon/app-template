@@ -1,5 +1,5 @@
 import { db } from "../../db/kysely/client";
-import { Errors } from "../errors";
+import { Errors } from "../../tests/errors";
 import { AuthUser } from "@/types/auth";
 import { verifyPassword } from "./password";
 import { UserRole } from "@/types/db";
