@@ -2,8 +2,8 @@ import { POST } from '@/app/api/auth/login/route';
 import { NextRequest } from 'next/server';
 import { db } from '@/db/kysely/client';
 import { hashPassword } from '@/lib/auth/password';
-import { Errors } from '../../../lib/errors';
-import { randomUUID } from 'crypto';
+import { testUser, testAdmin, createMockRequest } from './helpers';
+import { Errors } from '@/lib/errors';
 
 /*
 1. Test successful login:
@@ -35,46 +35,6 @@ import { randomUUID } from 'crypto';
     - Mock a NextRequest with correct credentials.
     - Call the POST function and verify that a session cookie is set with the correct attributes (HttpOnly, SameSite, Secure in production).
 */
-
-// Helper to create a properly typed mock NextRequest
-function createMockRequest(
-  body: Record<string, unknown>,
-  headers: Record<string, string> = {}
-): NextRequest {
-  const defaultHeaders = {
-    'content-type': 'application/json',
-    'user-agent': 'jest-test-runner',
-    'x-forwarded-for': '127.0.0.1',
-    ...headers,
-  };
-
-  const mockHeaders = new Headers();
-  Object.entries(defaultHeaders).forEach(([key, value]) => {
-    mockHeaders.set(key, value);
-  });
-
-  return {
-    json: async () => body,
-    headers: mockHeaders,
-  } as NextRequest;
-}
-
-// Generate valid UUIDs for test users
-const testUser = {
-  id: randomUUID(),
-  email: 'testuser@example.com',
-  username: 'testuser',
-  password: 'TestPassword123!',
-  system_role: 'user' as const,
-};
-
-const testAdmin = {
-  id: randomUUID(),
-  email: 'admin@example.com',
-  username: 'adminuser',
-  password: 'AdminPassword123!',
-  system_role: 'sysadmin' as const,
-};
 
 describe('Login Tests', () => {
   // Setup: Create test users before all tests
