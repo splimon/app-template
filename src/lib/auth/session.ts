@@ -110,15 +110,11 @@ export async function validateSessionFromCookies(cookieStore: CookieStore): Prom
  * @param request NextRequest object
  */
 export async function invalidateSession(request: NextRequest): Promise<SessionType> {
-    console.log('[session] Invalidating session...');
-
-    console.log('[session] Getting token from browser...');
     const sessionCookie = getSessionCookieFromBrowser(request);
     if (!sessionCookie) {
         throw Errors.NO_SESSION;
     }
     
-    console.log('[session] Deleting session from DB...');
     const hashedToken = hashToken(sessionCookie.token);
     await deleteTokenInDB(hashedToken);
 

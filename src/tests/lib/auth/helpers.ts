@@ -16,6 +16,7 @@ export const testAdmin = {
   username: 'adminuser',
   password: 'AdminPassword123!',
   system_role: 'sysadmin' as const,
+  sysadmin_token: 'valid-sysadmin-token',
 };
 
 export const testOrg = {
