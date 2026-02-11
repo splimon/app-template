@@ -23,18 +23,12 @@ function getExpirationDate(): Date {
  * @returns A promise that resolves to the modified NextResponse containing the session cookie.
  */
 export async function createSession(userID: string, sessionType: SessionType, response: NextResponse): Promise<NextResponse<unknown>> {
-    console.log('[session] Creating session for user:', userID.slice(0, 6), 'of type:', sessionType);
-
-    console.log('[session] Generating tokens...');
     const expiresAt = getExpirationDate();
     const { rawToken, hashedToken } = await generateToken();
 
-    console.log('[session] Storing session token in DB...');
     await storeTokenInDB(userID, hashedToken, expiresAt);
 
-    console.log('[session] Setting session cookie in browser...');
-    const res = setSessionCookieInBrowser(sessionType, response, rawToken, expiresAt);
-    
+    const res = setSessionCookieInBrowser(sessionType, response, rawToken, expiresAt);    
     return res;
 }
 
