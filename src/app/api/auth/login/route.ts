@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
       if (error instanceof AppError) {
             // Record failed login attempt if not due to rate limit (which is handled in checkLoginRateLimit)
+            console.warn(`[LOGIN] Failed login attempt for Identifier: ${identifier}. Reason: ${error.message}`);
             if (error.code !== 'TOO_MANY_REQUESTS') {
-                console.warn(`[LOGIN] Failed login attempt for Identifier: ${identifier}. Reason: ${error.message}`);
                 await recordLoginAttempt(ip, userAgent, identifier, false, error.message);
             }
             return NextResponse.json(
