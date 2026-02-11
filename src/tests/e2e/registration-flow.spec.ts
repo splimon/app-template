@@ -19,6 +19,8 @@ const newUser = {
   password: 'NewPassword123!',
 };
 
+test.describe.configure({ mode: 'serial' }); // Run tests in order since they depend on shared state (test user in DB)
+
 test.describe('Registration Flow', () => {
   test.afterEach(async () => {
     // Cleanup any user created during tests
@@ -49,7 +51,7 @@ test.describe('Registration Flow', () => {
       .execute();
 
     await db.deleteFrom('orgs')
-      .where('name', 'like', `TestOrg%${timestamp}`)
+      .where('name', 'like', `TestOrg%${randomSuffix}`)
       .execute();
 
     await db.destroy();
@@ -103,7 +105,7 @@ test.describe('Registration Flow', () => {
 
   test('should successfully register a new user with organization', async ({ page }) => {
     // First create an organization in the database
-    const orgName = `TestOrg${timestamp}`;
+    const orgName = `TestOrg${randomSuffix}`;
     const orgResult = await db
       .insertInto('orgs')
       .values({
@@ -228,6 +230,7 @@ test.describe('Registration Flow', () => {
     await page.fill('input#email', `test-${timestamp}@example.com`);
     await page.fill('input#username', `testuser${timestamp}`);
     await page.fill('input#password', '123'); // Too short
+    await page.fill('input#confirmPassword', '123');
 
     await page.click('button[type="submit"]');
 
@@ -245,6 +248,7 @@ test.describe('Registration Flow', () => {
     await page.fill('input#email', `test2-${timestamp}@example.com`);
     await page.fill('input#username', 'ab'); // Too short
     await page.fill('input#password', 'ValidPassword123!');
+    await page.fill('input#confirmPassword', 'ValidPassword123!');
 
     await page.click('button[type="submit"]');
 

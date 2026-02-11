@@ -22,14 +22,12 @@ const testUser = {
   password: 'TestPassword123!',
 };
 
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: 'serial' }); // Run tests in order since they depend on shared state (test user in DB)
 
 test.describe('Authentication Flow', () => {
   // Setup: Create test user before tests
   test.beforeAll(async () => {
     const passwordHash = await hashPassword(testUser.password);
-
-    console.log(`[SETUP] Creating test user in database: ${testUser.email}`);
     await db.insertInto('users').values({
       id: testUser.id,
       email: testUser.email,
@@ -49,7 +47,10 @@ test.describe('Authentication Flow', () => {
   });
 
   test('should successfully login with valid credentials', async ({ page }) => {
-    console.log(`[TEST] Starting successful login test for user: ${testUser.email}`);
+    // Ensure no login attempts or sessions exist for this user before starting
+    await db.deleteFrom('sessions').where('user_id', '=', testUser.id).execute();
+    await db.deleteFrom('login_attempts').where('identifier', '=', testUser.email).execute();
+
     await page.goto('/login');
 
     // Wait for the page to fully load (React hydration + network requests)
@@ -90,7 +91,6 @@ test.describe('Authentication Flow', () => {
   });
 
   test('should show error message with invalid credentials', async ({ page }) => {
-    console.log(`[TEST] Starting failed login test for user: ${testUser.email}`);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
     await page.waitForSelector('[id="login-form"]', { state: 'visible' });
@@ -109,8 +109,6 @@ test.describe('Authentication Flow', () => {
   });
 
   test('should lock account after multiple failed login attempts', async ({ page }) => {
-    console.log(`[TEST] Starting account lockout test for user: ${testUser.email}`);
-
     // Clear any existing failed attempts for this user
     await db.deleteFrom('login_attempts').where('identifier', '=', testUser.email).execute();
 
