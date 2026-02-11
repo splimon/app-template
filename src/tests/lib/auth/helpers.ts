@@ -64,3 +64,35 @@ export function createMockRequest(
     cookies: mockCookies,
   } as NextRequest;
 }
+
+export function createMockGetRequest(
+  url: string,
+  params: Record<string, string> = {},
+  cookies: Record<string, string> = {}
+): NextRequest {
+  const requestUrl = new URL(url);
+  Object.entries(params).forEach(([key, value]) => {
+    requestUrl.searchParams.set(key, value);
+  });
+
+  const mockCookies = {
+    get: (name: string) => {
+      const value = cookies[name];
+      return value ? { value, name } : undefined;
+    },
+    set: (name: string, value: string) => {
+      cookies[name] = value;
+    },
+    delete: (name: string) => {
+      delete cookies[name];
+    },
+    has: (name: string) => name in cookies,
+    getAll: () => Object.entries(cookies).map(([name, value]) => ({ name, value })),
+  };
+
+  return {
+    nextUrl: requestUrl,
+    url: requestUrl.toString(),
+    cookies: mockCookies,
+  } as NextRequest;
+}

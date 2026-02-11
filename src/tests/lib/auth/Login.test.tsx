@@ -1,5 +1,4 @@
 import { POST } from '@/app/api/auth/login/route';
-import { NextRequest } from 'next/server';
 import { db } from '@/db/kysely/client';
 import { hashPassword } from '@/lib/auth/password';
 import { testUser, testAdmin, createMockRequest } from './helpers';
