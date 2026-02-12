@@ -150,7 +150,7 @@ describe('Logout Tests', () => {
          expect(data.error).toBeDefined();
       });
 
-      test('should return 401 when session token is invalid', async () => {
+      test('should return 307 when session token is invalid', async () => {
          const request = createMockRequest(
             {},
             {},
@@ -175,11 +175,8 @@ describe('Logout Tests', () => {
          );
 
          const response = await POST(request);
-
-         // Empty cookie value should be treated as no session
-         // Based on getSessionCookieFromBrowser, empty string will still return the cookie
-         // This behavior depends on implementation - adjust test based on actual behavior
-         expect([307, 401]).toContain(response.status);
+         
+         expect(307).toContain(response.status);
       });
    });
 

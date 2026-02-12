@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
         // Invalidate session in backend (DB)
         const session = await invalidateSession(request);
 
-        const redirectUrl = new URL('/', process.env.NEXT_PUBLIC_BASE_URL);
+        const redirectUrl = new URL('/', process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000');
 
         // console.log('[LOGOUT] Setting redirect location to:', redirectUrl.toString(), '...');
         const res = NextResponse.redirect(redirectUrl);

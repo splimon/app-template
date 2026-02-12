@@ -3,8 +3,8 @@ import { randomUUID } from 'crypto';
 
 export const testUser = {
   id: randomUUID(),
-  email: 'testuser@example.com',
-  username: 'testuser',
+  email: `testuser${randomUUID().slice(0, 8)}@example.com`,
+  username: `testuser${randomUUID().slice(0, 8)}`,
   password: 'TestPassword123!',
   system_role: 'user' as const,
   session_token: 'valid-session-token',
@@ -12,8 +12,8 @@ export const testUser = {
 
 export const testAdmin = {
   id: randomUUID(),
-  email: 'admin@example.com',
-  username: 'adminuser',
+  email: `admin${randomUUID().slice(0, 8)}@example.com`,
+  username: `adminuser${randomUUID().slice(0, 8)}`,
   password: 'AdminPassword123!',
   system_role: 'sysadmin' as const,
   sysadmin_token: 'valid-sysadmin-token',
@@ -21,8 +21,8 @@ export const testAdmin = {
 
 export const testOrg = {
   id: randomUUID(),
-  name: 'Test Org',
-  slug: 'test-org'
+  name: `Test Org ${randomUUID().slice(0, 8)}`,
+  slug: `test-org-${randomUUID().slice(0, 8)}`
 };
 
 export function createMockRequest(

@@ -42,41 +42,26 @@ src/tests/
 
 ```bash
 # Run all Jest tests
-pnpm test
+pnpm test:jest
 
 # Run specific test file
-pnpm test Login.test.tsx
-
-# Watch mode
-pnpm test -- --watch
-
-# Coverage report
-pnpm test -- --coverage
+pnpm test:jest -- Login.test.tsx
 ```
 
 ### E2E Tests (Playwright)
 
 ```bash
 # Install browsers (first time only)
-pnpm exec playwright install
+pnpm playwright install
 
 # Run all E2E tests
-pnpm exec playwright test
+pnpm test:e2e
 
 # Run specific test file
-pnpm exec playwright test auth-flow
-
-# UI mode (interactive debugging)
-pnpm exec playwright test --ui
-
-# Headed mode (see browser)
-pnpm exec playwright test --headed
-
-# Debug mode (step-through)
-pnpm exec playwright test --debug
+pnpm test:e2e auth-flow
 
 # Single browser
-pnpm exec playwright test --project=chromium
+pnpm test:e2e --project=chromium
 ```
 
 ---

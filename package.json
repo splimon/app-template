@@ -18,8 +18,7 @@
     "migrate:version": "./scripts/migrate/version.sh",
     "migrate:force": "./scripts/migrate/force.sh",
     "test": "pnpm build && playwright test",
-    "test:e2e": "playwright test",
-    "test:jest": "jest"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
