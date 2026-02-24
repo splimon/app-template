@@ -1,0 +1,51 @@
+# Allows downstream repos to register themselves for template sync notifications.
+# Downstream repos call this via repository_dispatch to add themselves to the list.
+#
+# To register a downstream repo, run this in the downstream repo:
+#   gh api repos/jkapali/app-template/dispatches \
+#     -f event_type=register-downstream \
+#     -f client_payload='{"repo":"owner/repo-name"}'
+
+name: Register Downstream Repo
+
+on:
+  repository_dispatch:
+    types: [register-downstream]
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add repo to downstream list
+        run: |
+          REPO="${{ github.event.client_payload.repo }}"
+          if [ -z "$REPO" ]; then
+            echo "Error: No repo provided in payload"
+            exit 1
+          fi
+
+          # Read current list
+          REPOS=$(cat .github/downstream-repos.json)
+
+          # Check if already registered
+          if echo "$REPOS" | jq -e --arg repo "$REPO" 'index($repo) != null' > /dev/null; then
+            echo "Repo $REPO is already registered"
+            exit 0
+          fi
+
+          # Add to list
+          echo "$REPOS" | jq --arg repo "$REPO" '. + [$repo]' > .github/downstream-repos.json
+          echo "Added $REPO to downstream list"
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/downstream-repos.json
+          git diff --staged --quiet || git commit -m "chore: register downstream repo ${{ github.event.client_payload.repo }}"
+          git push
