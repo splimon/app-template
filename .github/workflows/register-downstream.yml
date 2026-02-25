@@ -1,10 +1,7 @@
-# Allows downstream repos to register themselves for template sync notifications.
-# Downstream repos call this via repository_dispatch to add themselves to the list.
+# Receives registration from downstream repos created from this template.
+# Stores the list of downstream repos in .github/downstream-repos.json
 #
-# To register a downstream repo, run this in the downstream repo:
-#   gh api repos/jkapali/app-template/dispatches \
-#     -f event_type=register-downstream \
-#     -f client_payload='{"repo":"owner/repo-name"}'
+# Downstream repos trigger this via repository_dispatch during their init script.
 
 name: Register Downstream Repo
 
@@ -18,34 +15,47 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Add repo to downstream list
         run: |
           REPO="${{ github.event.client_payload.repo }}"
+          APP_NAME="${{ github.event.client_payload.app_name }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
           if [ -z "$REPO" ]; then
             echo "Error: No repo provided in payload"
             exit 1
           fi
 
+          # Initialize file if it doesn't exist
+          if [ ! -f .github/downstream-repos.json ]; then
+            echo "[]" > .github/downstream-repos.json
+          fi
+
           # Read current list
           REPOS=$(cat .github/downstream-repos.json)
 
-          # Check if already registered
-          if echo "$REPOS" | jq -e --arg repo "$REPO" 'index($repo) != null' > /dev/null; then
+          # Check if already registered (by repo name)
+          if echo "$REPOS" | jq -e --arg repo "$REPO" 'map(select(.repo == $repo)) | length > 0' > /dev/null; then
             echo "Repo $REPO is already registered"
             exit 0
           fi
 
-          # Add to list
-          echo "$REPOS" | jq --arg repo "$REPO" '. + [$repo]' > .github/downstream-repos.json
+          # Add to list with metadata
+          echo "$REPOS" | jq --arg repo "$REPO" --arg app "$APP_NAME" --arg ts "$TIMESTAMP" \
+            '. + [{"repo": $repo, "app_name": $app, "registered_at": $ts}]' > .github/downstream-repos.json
+
           echo "Added $REPO to downstream list"
+          cat .github/downstream-repos.json
 
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .github/downstream-repos.json
-          git diff --staged --quiet || git commit -m "chore: register downstream repo ${{ github.event.client_payload.repo }}"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: register downstream repo ${{ github.event.client_payload.repo }}"
+            git push
+          fi

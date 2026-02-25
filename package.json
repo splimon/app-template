@@ -9,6 +9,7 @@
     "lint": "eslint",
     "init": "./scripts/init/_index.sh",
     "init:ssh": "./scripts/init/ssh-key.sh",
+    "init:register": "./scripts/init/register.sh",
     "init:seed": "tsx ./scripts/init/seed.ts",
     "init:sysadmin": "tsx ./scripts/init/sysadmin.ts",
     "codegen": "kysely-codegen",

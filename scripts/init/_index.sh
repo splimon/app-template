@@ -110,6 +110,18 @@ if [ $? -ne 0 ]; then
 fi
 echo ""
 
+# Add template repo as git remote for future syncing
+echo "Adding template repository as git remote..."
+if git remote get-url template > /dev/null 2>&1; then
+    echo "Template remote already exists."
+else
+    git remote add template git@github.com:PurpleMaia/app-template.git
+    echo "Template remote added. You can sync template updates with:"
+    echo "  git fetch template"
+    echo "  git merge template/main --allow-unrelated-histories"
+fi
+echo ""
+
 # Catch SIGINT to exit gracefully
 trap "echo 'Initialization interrupted! Exiting...'; exit 1" SIGINT
 
