@@ -1,10 +1,15 @@
 import type { Selectable, Insertable, Updateable } from 'kysely';
 import type { DB, Sysrole } from '../db/types';
-import type { Role,  } from '../db/types'
+import type { Role } from '../db/types';
 
 // Custom Enums
 export type UserRole = Role;
 export type SystemRole = Sysrole;
+
+// Activity Categories
+export type ActivityCategory = Selectable<DB['activity_categories']>;
+export type NewActivityCategory = Insertable<DB['activity_categories']>;
+export type ActivityCategoryUpdate = Updateable<DB['activity_categories']>;
 
 // Login Attempts
 export type LoginAttempt = Selectable<DB['login_attempts']>;
@@ -16,10 +21,10 @@ export type Member = Selectable<DB['members']>;
 export type NewMember = Insertable<DB['members']>;
 export type MemberUpdate = Updateable<DB['members']>;
 
-// Organizations
-export type Org = Selectable<DB['orgs']>;
-export type NewOrg = Insertable<DB['orgs']>;
-export type OrgUpdate = Updateable<DB['orgs']>;
+// Tenants
+export type Tenant = Selectable<DB['tenants']>;
+export type NewTenant = Insertable<DB['tenants']>;
+export type TenantUpdate = Updateable<DB['tenants']>;
 
 // Sessions
 export type Session = Selectable<DB['sessions']>;

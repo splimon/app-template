@@ -16,4 +16,5 @@ export const Errors = {
 
   ADMIN_REQUIRED: new AppError('ADMIN_REQUIRED', 403, 'Unauthorized: Admin access required.'),
   UNAUTHORIZED: new AppError('UNAUTHORIZED', 401, 'Unauthorized access. Please log in.'),
+  TENANT_ACCESS_DENIED: new AppError('TENANT_ACCESS_DENIED', 403, 'You do not have access to this tenant.'),
 } as const;

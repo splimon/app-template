@@ -31,9 +31,10 @@ export async function GET(request: NextRequest) {
     const code = searchParams.get("code");
     const state = searchParams.get("state");
 
-    // URLs for redirects
-    const loginUrl = new URL("/login", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
-    const dashboardUrl = new URL("/", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+    // URLs for redirects — use request origin so it works on both localhost and production
+    const origin = request.nextUrl.origin;
+    const loginUrl = new URL("/login", origin);
+    const dashboardUrl = new URL("/dashboard", origin);
 
     try {
         // Step 1: Verify required parameters are present
@@ -164,17 +165,40 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        // Step 7: Fetch user role (for multi-tenant support)
+        // Step 7: Fetch user role and tenant membership for smart redirect
         const role = await fetchUserRole(userId);
 
         console.log("[oauth/callback] User role:", role || "no organization");
 
+        // Determine redirect destination based on tenant membership
+        let redirectUrl = dashboardUrl;
+        if (role === "admin" || role === "worker") {
+            const membership = await db
+                .selectFrom("members")
+                .innerJoin("tenants", "tenants.id", "members.tenant_id")
+                .select(["tenants.slug", "members.user_role"])
+                .where("members.user_id", "=", userId)
+                .executeTakeFirst();
+
+            if (membership) {
+                const base = origin;
+                if (membership.user_role === "admin") {
+                    redirectUrl = new URL(`/t/${membership.slug}/dashboard/admin`, base);
+                } else {
+                    redirectUrl = new URL(`/t/${membership.slug}/worker`, base);
+                }
+            } else {
+                const base = origin;
+                redirectUrl = new URL("/pending", base);
+            }
+        }
+
         // Step 8: Create session using existing session infrastructure
         // This uses the same session system as password-based login
-        let response = NextResponse.redirect(dashboardUrl);
+        let response = NextResponse.redirect(redirectUrl);
         response = await createSession(userId, "user", response);
 
-        console.log("[oauth/callback] Session created, redirecting to dashboard");
+        console.log("[oauth/callback] Session created, redirecting to:", redirectUrl.pathname);
 
         return response;
     } catch (error) {

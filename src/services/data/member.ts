@@ -1,37 +1,37 @@
 import { db } from "@/db/kysely/client";
 
-type MemberOrg = {
+type WorkerTenant = {
   id: string;
   name: string;
   slug: string;
 };
 
-export type MemberDashboardData = {
-  org: MemberOrg | null;
+export type WorkerDashboardData = {
+  tenant: WorkerTenant | null;
   teamMemberCount: number;
 };
 
 /**
- * Retrieves dashboard data for a member user, including organization details and team member count.
- * @param userId The ID of the user whose dashboard data is being fetched.
- * @returns A promise that resolves to a MemberDashboardData object containing the organization (or null) and the number of team members.
+ * Retrieves dashboard data for a worker, including tenant details and team member count.
+ * @param userId The ID of the worker user.
+ * @returns A promise that resolves to a WorkerDashboardData object.
  */
-export async function fetchMemberDashboardData(userId: string): Promise<MemberDashboardData> {
-  const orgMembership = await db
+export async function fetchWorkerDashboardData(userId: string): Promise<WorkerDashboardData> {
+  const tenantMembership = await db
     .selectFrom("members as m")
-    .innerJoin("orgs as o", "m.org_id", "o.id")
+    .innerJoin("tenants as t", "m.tenant_id", "t.id")
     .select(({ ref }) => [
-      ref("o.id").as("orgId"),
-      ref("o.name").as("orgName"),
-      ref("o.slug").as("orgSlug"),
+      ref("t.id").as("tenantId"),
+      ref("t.name").as("tenantName"),
+      ref("t.slug").as("tenantSlug"),
     ])
     .where("m.user_id", "=", userId)
-    .where("m.user_role", "=", "member")
+    .where("m.user_role", "=", "worker")
     .executeTakeFirst();
 
-  if (!orgMembership) {
+  if (!tenantMembership) {
     return {
-      org: null,
+      tenant: null,
       teamMemberCount: 0,
     };
   }
@@ -39,14 +39,14 @@ export async function fetchMemberDashboardData(userId: string): Promise<MemberDa
   const teamCountResult = await db
     .selectFrom("members")
     .select(({ fn }) => fn.count<number>("id").as("count"))
-    .where("org_id", "=", orgMembership.orgId)
+    .where("tenant_id", "=", tenantMembership.tenantId)
     .executeTakeFirst();
 
   return {
-    org: {
-      id: orgMembership.orgId,
-      name: orgMembership.orgName,
-      slug: orgMembership.orgSlug,
+    tenant: {
+      id: tenantMembership.tenantId,
+      name: tenantMembership.tenantName,
+      slug: tenantMembership.tenantSlug,
     },
     teamMemberCount: Number(teamCountResult?.count ?? 0),
   };

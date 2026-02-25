@@ -18,7 +18,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
       email: user.email,
       systemRole: user.system_role,
       role: user.role,
-      orgName: user.org?.name ?? null,
+      tenantName: user.tenant?.name ?? null,
     };
 
     return (
