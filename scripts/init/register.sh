@@ -34,8 +34,9 @@ echo "Registering with PMF template repository..."
 if command -v gh &> /dev/null; then
     if gh auth status &> /dev/null; then
         gh api repos/PurpleMaia/app-template/dispatches \
+            --method POST \
             -f event_type=register-downstream \
-            -f "client_payload={\"repo\":\"$CURRENT_REPO\"}" \
+            -F client_payload[repo]="$CURRENT_REPO" \
             && echo "Successfully registered $CURRENT_REPO with PMF template." \
             || { echo "Error: Could not register with PMF template."; exit 1; }
     else
