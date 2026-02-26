@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+    baseURL: `${process.env.SPEACHES_BASE_URL}/v1`,
+    apiKey: process.env.SPEACHES_API_KEY?.trim(),
+});
 
 export async function POST(request: Request) {
   try {
@@ -15,17 +21,18 @@ export async function POST(request: Request) {
 
 
     // Transcribe the audio file using Speaches API
-    const response = await fetch(`${process.env.SPEACHES_BASE_URL}/v1/audio/transcriptions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.SPEACHES_API_KEY?.trim()}`,
-      },
-      body: form,
-    }).then(res => res.json());
-    
-    if (response.detail === "Invalid API key. The provided API key is incorrect.") {
-      return NextResponse.json({ error: "Invalid API key" }, { status: 403 });
-    }
+    const response = await openai.audio.transcriptions.create({
+      file: audio,
+      model: process.env.SPEACHES_STT_MODEL || "Systran/faster-whisper-large-v3",
+    });
+
+    // const response = await fetch(`${process.env.SPEACHES_BASE_URL}/v1/audio/transcriptions`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Authorization": `Bearer ${process.env.SPEACHES_API_KEY?.trim()}`,
+    //   },
+    //   body: form,
+    // }).then(res => res.json());
 
     return NextResponse.json(response);
   } catch (error) {
