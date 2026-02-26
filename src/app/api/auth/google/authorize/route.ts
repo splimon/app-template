@@ -56,7 +56,7 @@ export async function GET() {
         console.error("Error generating Google authorization URL:", error);
 
         // If something goes wrong, redirect back to login with error message
-        const loginUrl = new URL("/login", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+        const loginUrl = new URL("/login", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
         loginUrl.searchParams.set("error", "oauth_error");
         return NextResponse.redirect(loginUrl);
     }

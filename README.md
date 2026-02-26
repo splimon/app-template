@@ -59,6 +59,23 @@ pnpm --version    # Should be v8+
 migrate -version  # Should show version
 ```
 
+### Github CLI
+
+Required for github workflows and actions for Continuous Development
+**macOS:**
+```bash
+brew install gh
+```
+
+**Windows:**
+```bash
+scoop install gh
+```
+
+**Linux:**
+See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+
+
 ## Quick Start
 
 ### 1. Initialize the Project
