@@ -95,7 +95,7 @@ const DAILY_QUESTIONS = {
    - On submit: optionally compress and store reference in `kilo.image` (or skip postgres entirely for MVP)
 
 2. **Speech-to-text**
-   - Use Web Speech API (`webkitSpeechRecognition`) or Whisper API
+   - Use Whisper API
    - Store raw transcription in localStorage
    - Extract keywords/summary for postgres `kilo` record
 
