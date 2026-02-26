@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "server": "./server/start.sh",
+    "server:test": "./server/test.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
