@@ -4,6 +4,11 @@
 -   Photo upload + speech‑to‑text implemented for the daily questions
 -   List of onboarding steps for pilot users (what to do, when, where)
 
+UI/UX Must Haves:
+- workflow to get application to homescreen
+- app icon? (PMF logo)
+- Daily ʻŌlelo Noʻeau & Mahina Phase
+
 **Hybrid Approach: LocalStorage + Postgres**
 
 | Data Type | LocalStorage | Postgres |
@@ -136,6 +141,8 @@ const DAILY_QUESTIONS = {
 - `GET /api/kilo` - fetch user's kilo history (for display)
 - `POST /api/profile` - create/update profile
 - `GET /api/profile` - fetch user profile
+
+**Note:** Using API routes here, instead of server actions for our eventual Expo refactor (Expo/React Native can't use server actions)
 
 ---
 
