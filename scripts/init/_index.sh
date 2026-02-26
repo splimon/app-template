@@ -18,6 +18,45 @@ touch .env
 echo "PMF_DOKKU_HOST=$PMF_DOKKU_HOST" >> .env
 echo "" >> .env
 
+# Set up GitHub secret for Dokku SSH key
+echo ""
+echo "Setting up GitHub secret for Dokku deployment..."
+
+# Check if gh CLI is installed
+if ! command -v gh &> /dev/null; then
+    echo "GitHub CLI (gh) is not installed."
+    echo "Please install it from https://cli.github.com/ and run this script again."
+    echo "  - MacOS: brew install gh"
+    echo "  - Windows: scoop install gh"
+    echo "  - Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+    exit 1
+fi
+
+# Check if user is authenticated with gh
+if ! gh auth status &> /dev/null; then
+    echo "You are not logged into GitHub CLI. Please run 'gh auth login' first."
+    exit 1
+fi
+
+echo ""
+echo "Enter the SSH Private Key for Dokku access (get from PMF Builder Admin)."
+echo "This will be stored as a GitHub secret named 'SSH_PRIVATE_SANDBOX_DOKKU_JK'."
+echo "Paste the entire key including '-----BEGIN ... KEY-----' and '-----END ... KEY-----' lines."
+echo "Press Ctrl+D (or Ctrl+Z on Windows) when done:"
+SSH_PRIVATE_KEY=$(cat)
+
+# Set the GitHub secret
+echo ""
+echo "Creating GitHub secret SSH_PRIVATE_SANDBOX_DOKKU_JK..."
+echo "$SSH_PRIVATE_KEY" | gh secret set SSH_PRIVATE_SANDBOX_DOKKU_JK
+
+if [ $? -eq 0 ]; then
+    echo "GitHub secret SSH_PRIVATE_SANDBOX_DOKKU_JK created successfully."
+else
+    echo "Failed to create GitHub secret. Please check your permissions and try again."
+    exit 1
+fi
+echo ""
 # Check for SSH access to Dokku host
 echo "Verifying SSH access to Dokku host..."
 ssh dokku@$PMF_DOKKU_HOST apps:list > /dev/null 2>&1
