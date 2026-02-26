@@ -1,18 +1,7 @@
-// "use client" ensures this component runs only in the browser
 "use client";
 
 import { useState, useRef } from "react";
 
-/**
- * Simple audio recorder that captures microphone input, sends the recording to the
- * server‑side Whisper endpoint (/api/whisper) and displays the returned
- * transcription.
- *
- * The server expects a JSON payload with a base64‑encoded WAV/WEBM audio buffer:
- *   { "audio": "<base64 string>" }
- * It returns the OpenAI Whisper response – the most useful field for a UI
- * consumer is `text`.
- */
 export function AudioRecorder() {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -20,35 +9,29 @@ export function AudioRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  // Convert a Blob to a base64 string (without the data: prefix)
-  const blobToBase64 = (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string; // data:audio/webm;base64,....
-        resolve(result.split(",")[1]);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
-
-  const sendAudio = async (base64: string) => {
+  const sendAudio = async (fileBlob: Blob) => {
     try {
       setTranscribing(true);
-      const resp = await fetch("/api/whisper", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ audio: base64 }),
+      const formData = new FormData();
+      formData.append('file', fileBlob, 'audio.webm');
+
+      console.log("Sending audio blob to server:", fileBlob);
+      console.log("FormData contents:", formData);
+      
+      const resp = await fetch('/api/audio/transcribe', {
+        method: 'POST',
+        body: formData,
       });
-      if (!resp.ok) throw new Error("Server responded with " + resp.status);
+
+      if (!resp.ok) throw new Error('Server responded with ' + resp.status);
+
       const data = await resp.json();
-      // OpenAI's verbose JSON includes a `text` field with the transcription.
       setTranscript(data.text ?? JSON.stringify(data));
       setTranscribing(false);
     } catch (e) {
       console.error(e);
-      setTranscript("Error processing audio");
+      setTranscript('Error processing audio');
+      setTranscribing(false);
     }
   };
 
@@ -67,8 +50,7 @@ export function AudioRecorder() {
     };
     recorder.onstop = async () => {
       const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-      const base64 = await blobToBase64(blob);
-      await sendAudio(base64);
+      await sendAudio(blob);
       // clean up the microphone tracks
       stream.getTracks().forEach((t) => t.stop());
     };
