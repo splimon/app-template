@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cache } from 'react';
 import { AuthUser, SessionType } from '../../types/auth';
 import { deleteTokenInDB, generateToken, hashToken, storeTokenInDB } from './token';
 import { CookieStore, getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
@@ -13,6 +14,37 @@ import { fetchUserRole } from './login';
 function getExpirationDate(): Date {
     return new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours from now
 }
+
+/**
+ * Core session validation logic - validates a session token and returns user data.
+ * This is the shared implementation used by both validateSession and validateSessionFromCookies.
+ * Wrapped with React.cache() to memoize results during a single server request.
+ *
+ * @param hashedToken The hashed session token to validate
+ * @param sessionType The expected session type ('user' or 'sysadmin')
+ * @returns AuthUser object if session is valid
+ * @throws Errors.NO_SESSION if session is invalid or expired
+ */
+const validateSessionCore = cache(async (hashedToken: string, sessionType: SessionType): Promise<AuthUser> => {
+    if (process.env.NODE_ENV === "development") console.log('[validateSessionCore] Validating session (cached)');
+
+    // Fetch account data from session token - select only needed columns
+    const account = await db.selectFrom('sessions as s')
+        .innerJoin('users as u', 's.user_id', 'u.id')
+        .select(['u.id', 'u.email', 'u.username', 'u.system_role', 'u.created_at'])
+        .where('s.token_hash', '=', hashedToken)
+        .where('u.system_role', '=', sessionType)
+        .where('s.expires_at', '>', new Date())
+        .executeTakeFirst();
+
+    if (!account) {
+        throw Errors.NO_SESSION;
+    }
+
+    const role = await fetchUserRole(account.id);
+
+    return { ...account, role } as AuthUser;
+});
 
 /**
  * Creates a new user session.
@@ -33,7 +65,8 @@ export async function createSession(userID: string, sessionType: SessionType, re
 }
 
 /**
- * Gets the raw token from browser cookies, then finds the hashed version in the DB )
+ * Gets the raw token from browser cookies, then finds the hashed version in the DB.
+ * Uses React.cache() internally to avoid redundant database queries during a single request.
  * @param request NextRequest object
  * @returns AuthUser (all user data needed for application)
  * @throws Errors.NO_SESSION if the session cookie is missing or invalid
@@ -45,29 +78,12 @@ export async function validateSession(request: NextRequest): Promise<AuthUser> {
     }
 
     const hashedToken = hashToken(sessionCookie.token);
-    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', '[REDACTED]');
-
-    // Fetch account data from session token
-    const account = await db.selectFrom('sessions as s')        
-        .innerJoin('users as u', 's.user_id', 'u.id')
-        .select(['u.id', 'u.email', 'u.username', 'u.system_role', 'u.created_at'])
-        .where('token_hash', '=', hashedToken)
-        .where('u.system_role', '=', sessionCookie.type)
-        .where('expires_at', '>', new Date())
-        .executeTakeFirst();
-    
-    if (!account) {
-        throw Errors.NO_SESSION;
-    }
-
-    const role = await fetchUserRole(account.id)
-
-    return { ...account, role } as AuthUser
+    return validateSessionCore(hashedToken, sessionCookie.type);
 }
 
 /**
  * Validates a session using a provided CookieStore (e.g., server-side cookie object).
- * This is similar to `validateSession` but operates on an explicit cookie store rather than a NextRequest.
+ * Uses React.cache() internally to avoid redundant database queries during a single request.
  * @param cookieStore The CookieStore containing session cookies.
  * @returns A promise that resolves to an AuthUser if the session is valid.
  * @throws Errors.NO_SESSION if the session cookie is missing or invalid.
@@ -79,24 +95,7 @@ export async function validateSessionFromCookies(cookieStore: CookieStore): Prom
     }
 
     const hashedToken = hashToken(sessionCookie.token);
-    if (process.env.NODE_ENV === "development") console.log('[validateSession] Validating session for token:', '[REDACTED]');
-
-    // Fetch account data from session token
-    const account = await db.selectFrom('sessions as s')        
-        .innerJoin('users as u', 's.user_id', 'u.id')
-        .select(['u.id', 'u.email', 'u.username', 'u.system_role', 'u.created_at'])
-        .where('token_hash', '=', hashedToken)
-        .where('u.system_role', '=', sessionCookie.type)
-        .where('expires_at', '>', new Date())
-        .executeTakeFirst();
-    
-    if (!account) {
-        throw Errors.NO_SESSION;
-    }
-
-    const role = await fetchUserRole(account.id)
-
-    return { ...account, role } as AuthUser
+    return validateSessionCore(hashedToken, sessionCookie.type);
 }
 
 /**
