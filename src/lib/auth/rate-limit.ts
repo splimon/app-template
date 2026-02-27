@@ -88,7 +88,9 @@ export async function checkLoginRateLimit(ip: string | null, identifier: string)
     const attemptCount = result ? Number(result.attemptCount) : 0;
     const remainingAttempts = Math.max(0, MAX_ATTEMPTS - attemptCount);
 
-    console.log(`[RateLimit] Login attempts in last ${WINDOW_MINUTES} minutes for Identifier (${identifier}): ${attemptCount}. Remaining: ${remainingAttempts}`);
+    if (process.env.NODE_ENV !== "production") {
+        console.log(`[RateLimit] Login attempts in last ${WINDOW_MINUTES} minutes for Identifier (${identifier}): ${attemptCount}. Remaining: ${remainingAttempts}`);
+    }
 
     if (attemptCount >= MAX_ATTEMPTS) {
         throw Errors.TOO_MANY_REQUESTS;

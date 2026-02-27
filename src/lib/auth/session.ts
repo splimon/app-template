@@ -26,7 +26,7 @@ function getExpirationDate(): Date {
  * @throws Errors.NO_SESSION if session is invalid or expired
  */
 const validateSessionCore = async (hashedToken: string, sessionType: SessionType): Promise<AuthUser> => {
-    if (process.env.NODE_ENV === "development") console.log('[validateSessionCore] Validating session (cached)');
+    if (process.env.NODE_ENV === "development") console.log('[validateSessionCore] Validating session...');
 
     // Fetch account data from session token - select only needed columns
     const account = await db.selectFrom('sessions as s')
@@ -73,6 +73,7 @@ export async function createSession(userID: string, sessionType: SessionType, re
  */
 export async function validateSession(request: NextRequest): Promise<AuthUser> {
     const sessionCookie = getSessionCookieFromBrowser(request);
+    
     if (!sessionCookie) {
         throw Errors.NO_SESSION;
     }

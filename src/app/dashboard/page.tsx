@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { validateSessionFromCookies } from "@/lib/auth/session";
-import DashboardRedirectClient from "./DashboardRedirectClient";
 
 /**
  * Dashboard Index Page
@@ -12,23 +12,22 @@ import DashboardRedirectClient from "./DashboardRedirectClient";
  * - /dashboard/guest - Guest users (no organization)
  */
 export default async function DashboardPage() {
-  let destination = "/login?type=user";
+  const cookieStore = await cookies();
 
+  let user;
   try {
-    const cookieStore = await cookies();
-    const user = await validateSessionFromCookies(cookieStore);
-    if (user.system_role === "sysadmin") {
-      destination = "/dashboard/sysadmin";
-    } else if (user.role === "admin") {
-      destination = "/dashboard/admin";
-    } else if (user.role === "member") {
-      destination = "/dashboard/member";
-    } else {
-      destination = "/dashboard/guest";
-    }
+    user = await validateSessionFromCookies(cookieStore);
   } catch {
-    destination = "/login?type=user";
+    redirect("/login?type=user");
   }
 
-  return <DashboardRedirectClient destination={destination} />;
+  if (user.system_role === "sysadmin") {
+    redirect("/dashboard/sysadmin");
+  } else if (user.role === "admin") {
+    redirect("/dashboard/admin");
+  } else if (user.role === "member") {
+    redirect("/dashboard/member");
+  } else {
+    redirect("/dashboard/guest");
+  }
 }

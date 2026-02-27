@@ -4,14 +4,11 @@ import { validateSessionFromCookies } from "@/lib/auth/session";
 import GuestDashboardClient from "./GuestDashboardClient";
 
 export default async function GuestDashboard() {
-  let user;
-  try {
-    const cookieStore = await cookies();
-    user = await validateSessionFromCookies(cookieStore);
-  } catch {
-    redirect("/login?type=user");
-  }
+  // Fetching user data to give to client component and ensure user is a guest (not member or sysadmin)
+  const cookieStore = await cookies();
+  const user = await validateSessionFromCookies(cookieStore);
 
+  // Role guard - redirect if not guest (has org role or is sysadmin)
   if (user.system_role === "sysadmin" || user.role !== null) {
     redirect("/dashboard");
   }

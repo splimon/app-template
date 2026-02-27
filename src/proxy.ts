@@ -17,6 +17,7 @@ export function proxy(request: NextRequest) {
 
     // If user is authenticated and trying to access auth routes, redirect to dashboard
     if (isAuthenticated && authRoutes.some(route => pathname === route)) {
+        console.log(`[proxy] Authenticated user accessing ${pathname}, redirecting to /dashboard`);
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 

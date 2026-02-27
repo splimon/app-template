@@ -5,14 +5,10 @@ import { fetchMemberDashboardData } from "@/lib/data/member";
 import MemberDashboardClient from "./MemberDashboardClient";
 
 export default async function MemberDashboard() {
-  let user;
-  try {
-    const cookieStore = await cookies();
-    user = await validateSessionFromCookies(cookieStore);
-  } catch {
-    redirect("/login?type=user");
-  }
+  const cookieStore = await cookies();
+  const user = await validateSessionFromCookies(cookieStore);
 
+  // Role guard - redirect if not member
   if (user.system_role === "sysadmin" || user.role !== "member") {
     redirect("/dashboard");
   }

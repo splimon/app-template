@@ -5,14 +5,10 @@ import { fetchAdminDashboardData } from "@/lib/data/admin";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 export default async function AdminDashboard() {
-  let user;
-  try {
-    const cookieStore = await cookies();
-    user = await validateSessionFromCookies(cookieStore);
-  } catch {
-    redirect("/login?type=user");
-  }
+  const cookieStore = await cookies();
+  const user = await validateSessionFromCookies(cookieStore);
 
+  // Role guard - redirect if not admin
   if (user.system_role === "sysadmin" || user.role !== "admin") {
     redirect("/dashboard");
   }

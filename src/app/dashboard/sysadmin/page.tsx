@@ -5,14 +5,10 @@ import { fetchSysAdminDashboardData } from "@/lib/data/sysadmin";
 import SysAdminDashboardClient from "./SysAdminDashboardClient";
 
 export default async function SysAdminDashboard() {
-  let user;
-  try {
-    const cookieStore = await cookies();
-    user = await validateSessionFromCookies(cookieStore);
-  } catch {
-    redirect("/login?type=sysadmin");
-  }
+  const cookieStore = await cookies();
+  const user = await validateSessionFromCookies(cookieStore);
 
+  // Role guard - redirect if not sysadmin
   if (user.system_role !== "sysadmin") {
     redirect("/dashboard");
   }
