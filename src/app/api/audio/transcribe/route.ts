@@ -10,10 +10,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No audio sent" }, { status: 400 });
     }
 
-    const form = new FormData();
-    form.append("file", audio);
-    form.append("model", "Systran/faster-whisper-large-v3");
-
     const baseUrl = process.env.SPEACHES_BASE_URL?.trim();
     const apiKey = process.env.SPEACHES_API_KEY?.trim();
     if (!baseUrl || !apiKey) {
