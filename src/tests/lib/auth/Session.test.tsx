@@ -2,7 +2,7 @@ import { GET } from '@/app/api/auth/session/route';
 import { db } from '@/db/kysely/client';
 import { Errors } from '@/lib/errors';
 import { hashPassword } from '@/lib/auth/password';
-import { testUser, createMockRequest, testOrg } from './helpers';
+import { testUser, createMockRequest, testOrg } from '../../helpers';
 import { randomUUID } from 'crypto';
 import { hashToken } from '@/lib/auth/token';
 
@@ -185,13 +185,14 @@ describe('Session Validation Tests', () => {
       })
 
       test('should correctly validate different session tokens', async () => {
-         // Create a second user and session
+         // Create a second user and session with unique identifiers
+         const uniqueSuffix = randomUUID().slice(0, 8);
          const secondUser = {
             id: randomUUID(),
-            email: 'seconduser@example.com',
-            username: 'seconduser',
+            email: `seconduser-${uniqueSuffix}@example.com`,
+            username: `seconduser${uniqueSuffix}`,
             password: 'SecurePassword123!',
-            session_token: 'second-valid-token',
+            session_token: `second-valid-token-${uniqueSuffix}`,
          };
 
          const passwordHash = await hashPassword(secondUser.password);
