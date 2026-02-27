@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-    baseURL: `${process.env.SPEACHES_BASE_URL}/v1`,
-    apiKey: process.env.SPEACHES_API_KEY?.trim(),
-});
 export async function POST(request: Request) {
   try {
-    // In a real implementation you would parse the request body for custom input,
-    // but for now we keep the static example payload.
+    const baseUrl = process.env.SPEACHES_BASE_URL?.trim();
+    const apiKey = process.env.SPEACHES_API_KEY?.trim();
+    if (!baseUrl || !apiKey) {
+      console.error("[speaches] Missing SPEACHES_BASE_URL or SPEACHES_API_KEY environment variables");
+      return NextResponse.json(
+        { error: "Speaches configuration is missing. Please contact the administrator." },
+        { status: 500 }
+      );
+    }
+    const openai = new OpenAI({
+      baseURL: `${baseUrl}/v1`,
+      apiKey,
+    });
+
     const question = {
       "input": "What is your weather like today?",
       "model": process.env.SPEACHES_TTS_MODEL || "speaches-ai/Kokoro-82M-v1.0-ONNX",
