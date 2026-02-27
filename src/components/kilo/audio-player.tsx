@@ -1,11 +1,21 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function AudioPlayer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const urlRef = useRef<string | null>(null);
+
+  // Cleanup object URL on component unmount
+  useEffect(() => {
+    return () => {
+      if (urlRef.current) {
+        URL.revokeObjectURL(urlRef.current);
+      }
+    };
+  }, []);
 
   const playSpeech = async () => {
     setLoading(true);
@@ -16,9 +26,14 @@ export default function AudioPlayer() {
         throw new Error(`Server responded with ${resp.status}`);
       }
       const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
+      const newUrl = URL.createObjectURL(blob);
+      // Revoke previous object URL if it exists to avoid memory leaks
+      if (urlRef.current) {
+        URL.revokeObjectURL(urlRef.current);
+      }
+      urlRef.current = newUrl;
       if (audioRef.current) {
-        audioRef.current.src = url;
+        audioRef.current.src = newUrl;
         await audioRef.current.play();
       }
     } catch (e: any) {
