@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AudioRecorder } from "@/components/kilo/audio-recorder";
+import AudioPlayer from "@/components/kilo/audio-player";
 
 type DashboardUser = {
   id: string;
@@ -29,6 +31,10 @@ export default function GuestDashboardClient({ user }: GuestDashboardClientProps
         </div>
         <Badge variant="outline" className="text-sm">Guest</Badge>
       </div>
+
+      <AudioPlayer />
+
+      <AudioRecorder />
 
       <Alert>
         <svg
