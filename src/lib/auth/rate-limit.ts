@@ -120,14 +120,14 @@ export async function clearFailedAttempts(ip: string | null, identifier: string)
  * @param ip The IP address of the client (may be null).
  * @param userAgent The User-Agent string of the client (may be null).
  */
-export async function recordRegistrationAttempt(ip: string | null, userAgent: string | null): Promise<void> {
+export async function recordRegistrationAttempt(ip: string | null, userAgent: string | null, success: boolean = true, error?: string): Promise<void> {
     const result = await db.insertInto('login_attempts')
         .values({
             ip_address: ip,
             user_agent: userAgent,
             identifier: 'REGISTRATION',
-            error_message: null,
-            successful: true
+            error_message: error ?? null,
+            successful: success
         })
         .execute();
 

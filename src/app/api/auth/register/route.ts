@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@/db/kysely/client";
 import { createSession } from "@/lib/auth/session";
 import { hashPassword } from "@/lib/auth/password";
-import { getClientIP, getUserAgent, checkRegistrationRateLimit, recordRegistrationAttempt } from "@/lib/auth/rate-limit";
+import { getClientIP, getUserAgent, checkRegistrationRateLimit, recordRegistrationAttempt, recordLoginAttempt } from "@/lib/auth/rate-limit";
 import { Errors } from "@/lib/errors";
 
 const registerSchema = z.object({
@@ -17,6 +17,10 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Parse request body early to extract potential identifier for logging
+  const body = await request.json();
+  const parsedEarly = registerSchema.safeParse(body);
+  const earlyUsername = parsedEarly.success ? parsedEarly.data.username : null;
   const ip = getClientIP(request);
   const userAgent = getUserAgent(request);
 
@@ -24,12 +28,12 @@ export async function POST(request: NextRequest) {
     // Check rate limit before processing registration
     await checkRegistrationRateLimit(ip);
 
-    const body = await request.json();
-
     // Validate credential inputs
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
+      // Record failed registration attempt (validation error)
+      await recordRegistrationAttempt(ip, userAgent, false, 'VALIDATION_ERROR');
       return NextResponse.json(
         { error: "Invalid input", issues: parsed.error.issues },
         { status: 400 }
@@ -123,6 +127,9 @@ export async function POST(request: NextRequest) {
     return sessionSetResponse;
 
   } catch (error) {
+    // Record failed registration attempt for any error path
+    const errMsg = error instanceof Error ? error.message : String(error);
+    await recordLoginAttempt(ip, userAgent, earlyUsername ?? 'unknown', false, errMsg);
     // Handle rate limit error
     if (error === Errors.TOO_MANY_REQUESTS) {
         return NextResponse.json(
