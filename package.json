@@ -22,6 +22,7 @@
     "migrate:force": "./scripts/migrate/force.sh",
     "test": "pnpm build && playwright test",
     "test:e2e": "playwright test",
+    "test:unit": "jest",
     "sync": "./scripts/sync-template.sh"
   },
   "dependencies": {

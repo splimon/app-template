@@ -3,6 +3,7 @@ import { db } from '@/db/kysely/client';
 import { hashPassword } from '@/lib/auth/password';
 import { createMockRequest, testOrg } from './helpers';
 import { randomUUID } from 'crypto';
+import { Errors } from '@/lib/errors';
 
 /*
 1. Test successful registration without organization:
@@ -308,6 +309,91 @@ describe('Registration Tests', () => {
          expect(response.status).toBe(400);
          const data = await response.json();
          expect(data.error).toBe('Invalid input');
+      });
+   });
+
+   describe('Rate Limiting', () => {
+      const rateLimitTestIP = '192.168.1.100';
+
+      // Clean up rate limit records after each test
+      afterEach(async () => {
+         await db.deleteFrom('login_attempts')
+            .where('ip_address', '=', rateLimitTestIP)
+            .where('identifier', '=', 'REGISTRATION')
+            .execute();
+      });
+
+      test('should allow registration within rate limit', async () => {
+         const request = createMockRequest(
+            {
+               email: registerTestUser.email,
+               username: registerTestUser.username,
+               password: registerTestUser.password,
+            },
+            { 'x-forwarded-for': rateLimitTestIP }
+         );
+
+         const response = await POST(request);
+
+         expect(response.status).toBe(201);
+      });
+
+      test('should block registration after exceeding rate limit', async () => {
+         // Insert 5 registration attempts to simulate hitting the limit
+         const now = new Date();
+         for (let i = 0; i < 5; i++) {
+            await db.insertInto('login_attempts').values({
+               ip_address: rateLimitTestIP,
+               user_agent: 'test-agent',
+               identifier: 'REGISTRATION',
+               successful: true,
+               attempt_at: now,
+            }).execute();
+         }
+
+         // Try to register - should be blocked
+         const request = createMockRequest(
+            {
+               email: 'ratelimit@example.com',
+               username: 'ratelimituser',
+               password: 'SecurePassword123!',
+            },
+            { 'x-forwarded-for': rateLimitTestIP }
+         );
+
+         const response = await POST(request);
+
+         expect(response.status).toBe(429);
+         const data = await response.json();
+         expect(data.error).toBe(Errors.TOO_MANY_REQUESTS.message);
+      });
+
+      test('should allow registration after rate limit window expires', async () => {
+         // Insert 5 old registration attempts (outside the 1 hour window)
+         const oldTime = new Date(Date.now() - 61 * 60 * 1000); // 61 minutes ago
+         for (let i = 0; i < 5; i++) {
+            await db.insertInto('login_attempts').values({
+               ip_address: rateLimitTestIP,
+               user_agent: 'test-agent',
+               identifier: 'REGISTRATION',
+               successful: true,
+               attempt_at: oldTime,
+            }).execute();
+         }
+
+         // Try to register - should succeed since old attempts are outside window
+         const request = createMockRequest(
+            {
+               email: registerTestUser.email,
+               username: registerTestUser.username,
+               password: registerTestUser.password,
+            },
+            { 'x-forwarded-for': rateLimitTestIP }
+         );
+
+         const response = await POST(request);
+
+         expect(response.status).toBe(201);
       });
    });
 });
