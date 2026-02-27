@@ -1,21 +1,44 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const USER_COOKIE_NAME = "session_token";
-const SYSADMIN_COOKIE_NAME = "sysadmin_token";
+// Routes that require authentication
+const protectedRoutes = ['/dashboard'];
+
+// Routes that should redirect to dashboard if already authenticated
+const authRoutes = ['/', '/login', '/register'];
 
 export function proxy(request: NextRequest) {
-  const hasUserCookie = request.cookies.get(USER_COOKIE_NAME);
-  const hasSysadminCookie = request.cookies.get(SYSADMIN_COOKIE_NAME);
+    const { pathname } = request.nextUrl;
 
-  if (!hasUserCookie && !hasSysadminCookie) {
-    const loginUrl = new URL("/login?type=user", request.url);
-    return NextResponse.redirect(loginUrl);
-  }
+    // Check for session cookies
+    const sessionToken = request.cookies.get('session_token');
+    const sysadminToken = request.cookies.get('sysadmin_token');
+    const isAuthenticated = !!(sessionToken || sysadminToken);
 
-  return NextResponse.next();
+    // If user is authenticated and trying to access auth routes, redirect to dashboard
+    if (isAuthenticated && authRoutes.some(route => pathname === route)) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    // If user is not authenticated and trying to access protected routes, redirect to login
+    if (!isAuthenticated && protectedRoutes.some(route => pathname.startsWith(route))) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('type', 'user');
+        return NextResponse.redirect(loginUrl);
+    }
+
+    return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+    matcher: [
+        /*
+         * Match all request paths except:
+         * - api routes (API handles its own auth)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico, images, etc.
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    ],
 };
