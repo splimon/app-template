@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cache } from 'react';
+// Removed React.cache import – caching not needed for API auth
 import { AuthUser, SessionType } from '../../types/auth';
 import { deleteTokenInDB, generateToken, hashToken, storeTokenInDB } from './token';
 import { CookieStore, getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
@@ -25,7 +25,7 @@ function getExpirationDate(): Date {
  * @returns AuthUser object if session is valid
  * @throws Errors.NO_SESSION if session is invalid or expired
  */
-const validateSessionCore = cache(async (hashedToken: string, sessionType: SessionType): Promise<AuthUser> => {
+const validateSessionCore = async (hashedToken: string, sessionType: SessionType): Promise<AuthUser> => {
     if (process.env.NODE_ENV === "development") console.log('[validateSessionCore] Validating session (cached)');
 
     // Fetch account data from session token - select only needed columns
@@ -44,7 +44,7 @@ const validateSessionCore = cache(async (hashedToken: string, sessionType: Sessi
     const role = await fetchUserRole(account.id);
 
     return { ...account, role } as AuthUser;
-});
+};
 
 /**
  * Creates a new user session.
