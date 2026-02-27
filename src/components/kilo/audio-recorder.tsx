@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 
+/** Ask browser what audio format it supports */
 function getSupportedMimeType(): string {
   const types = ["audio/webm", "audio/mp4", "audio/ogg"];
   return types.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
@@ -18,6 +19,8 @@ export function AudioRecorder() {
     try {
       setTranscribing(true);
       const formData = new FormData();
+
+      // Ensure the file has the correct extension based on its MIME type
       const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm";
       formData.append('file', fileBlob, `audio.${ext}`);
 
@@ -43,10 +46,12 @@ export function AudioRecorder() {
 
   const startRecording = async () => {
     try {
+      // Request microphone access and start recording
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = getSupportedMimeType();
       const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
 
+      // Store references to the recorder and audio chunks
       mediaRecorderRef.current = recorder;
       chunksRef.current = [];
 
