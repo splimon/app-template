@@ -3,6 +3,8 @@ import { z } from "zod";
 import { db } from "@/db/kysely/client";
 import { createSession } from "@/lib/auth/session";
 import { hashPassword } from "@/lib/auth/password";
+import { getClientIP, getUserAgent, checkRegistrationRateLimit, recordRegistrationAttempt } from "@/lib/auth/rate-limit";
+import { Errors } from "@/lib/errors";
 
 const registerSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),
@@ -15,8 +17,13 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const userAgent = getUserAgent(request);
 
   try {
+    // Check rate limit before processing registration
+    await checkRegistrationRateLimit(ip);
+
     const body = await request.json();
 
     // Validate credential inputs
@@ -96,8 +103,11 @@ export async function POST(request: NextRequest) {
         .execute();
     }
 
+    // Record successful registration attempt for rate limiting
+    await recordRegistrationAttempt(ip, userAgent);
+
     // Create session and return response
-    const res = NextResponse.json({ 
+    const res = NextResponse.json({
       user: {
         id: newUser.id,
         email: newUser.email,
@@ -107,33 +117,41 @@ export async function POST(request: NextRequest) {
         role: organizationId ? 'member' : null
       }
     }, { status: 201 });
-    
+
     const sessionSetResponse = await createSession(newUser.id, 'user', res);
-    
+
     return sessionSetResponse;
 
   } catch (error) {
+    // Handle rate limit error
+    if (error === Errors.TOO_MANY_REQUESTS) {
+        return NextResponse.json(
+            { error: Errors.TOO_MANY_REQUESTS.message },
+            { status: 429 }
+        );
+    }
+
     const message = error instanceof Error ? error.message : String(error);
     switch (message) {
         case 'EXISTING_USERNAME':
             return NextResponse.json(
-                { error: 'Username already taken' }, 
+                { error: 'Username already taken' },
                 { status: 409 }
             );
         case 'EXISTING_EMAIL':
             return NextResponse.json(
-                { error: 'Email already taken' }, 
+                { error: 'Email already taken' },
                 { status: 409 }
-            );                
+            );
         case 'ORGANIZATION_NOT_FOUND':
             return NextResponse.json(
-                { error: 'Associated organization not found' }, 
+                { error: 'Associated organization not found' },
                 { status: 404 }
-            );            
+            );
         default:
             console.error('[REGISTER]', error);
             return NextResponse.json(
-                { error: 'Internal Server Error' }, 
+                { error: 'Internal Server Error' },
                 { status: 500 }
             );
     }
