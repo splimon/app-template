@@ -2,6 +2,11 @@
 
 import { useState, useRef } from "react";
 
+function getSupportedMimeType(): string {
+  const types = ["audio/webm", "audio/mp4", "audio/ogg"];
+  return types.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+}
+
 export function AudioRecorder() {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -9,11 +14,12 @@ export function AudioRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  const sendAudio = async (fileBlob: Blob) => {
+  const sendAudio = async (fileBlob: Blob, mimeType: string) => {
     try {
       setTranscribing(true);
       const formData = new FormData();
-      formData.append('file', fileBlob, 'audio.webm');
+      const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm";
+      formData.append('file', fileBlob, `audio.${ext}`);
 
       console.log("Sending audio blob to server:", fileBlob);
       console.log("FormData contents:", formData);
@@ -36,26 +42,37 @@ export function AudioRecorder() {
   };
 
   const startRecording = async () => {
-    if (!navigator.mediaDevices?.getUserMedia) {
-      alert("Your browser does not support audio capture.");
-      return;
-    }
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const recorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = recorder;
-    chunksRef.current = [];
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = getSupportedMimeType();
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
 
-    recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunksRef.current.push(e.data);
-    };
-    recorder.onstop = async () => {
-      const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-      await sendAudio(blob);
-      // clean up the microphone tracks
-      stream.getTracks().forEach((t) => t.stop());
-    };
-    recorder.start();
-    setRecording(true);
+      mediaRecorderRef.current = recorder;
+      chunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: mimeType || "audio/mp4" });
+        await sendAudio(blob, mimeType);
+        stream.getTracks().forEach((t) => t.stop());
+      };
+
+      recorder.start();
+      setRecording(true);
+    } catch (e: any) {
+      if (e?.name === "NotAllowedError") {
+        alert("Microphone permission was denied. Please allow access in your browser settings.");
+      } else if (e?.name === "NotFoundError") {
+        alert("No microphone found on this device.");
+      } else {
+        // Last resort fallback for browsers that truly can't do getUserMedia
+        alert("Audio capture is not supported. Try opening this page in Safari 14.3+ and ensure the site is served over HTTPS.");
+        console.error(e);
+      }
+    }
   };
 
   const stopRecording = () => {
