@@ -1,12 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { validateSessionFromCookies } from "@/lib/auth/session";
+import { getAuthUser } from "@/lib/auth/session";
 import { fetchSysAdminDashboardData } from "@/lib/data/sysadmin";
 import SysAdminDashboardClient from "./SysAdminDashboardClient";
 
 export default async function SysAdminDashboard() {
-  const cookieStore = await cookies();
-  const user = await validateSessionFromCookies(cookieStore);
+  let user;
+  try {
+    user = await getAuthUser();
+  } catch {
+    redirect("/login?type=sysadmin");
+  }
 
   // Role guard - redirect if not sysadmin
   if (user.system_role !== "sysadmin") {

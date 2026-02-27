@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import { validateSessionFromCookies } from "@/lib/auth/session";
+import { getAuthUser } from "@/lib/auth/session";
 import { AuthProvider } from "@/hooks/contexts/AuthContext";
 import DashboardHeader from "../../components/shared/DashboardHeader";
 
@@ -11,15 +10,11 @@ interface DashboardLayoutProps {
 }
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-  const cookieStore = await cookies();
-
   let user;
   try {
-    user = await validateSessionFromCookies(cookieStore);
-    console.log(`[DashboardLayout] Authenticated user: ${user.username} (${user.email})`);
+    user = await getAuthUser();
   } catch {
-    console.log("[DashboardLayout] No valid session found, redirecting to login");
-    redirect("/login?type=user");
+    redirect("/login");
   }
 
   const headerUser = {

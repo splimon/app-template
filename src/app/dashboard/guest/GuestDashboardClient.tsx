@@ -6,17 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AudioRecorder } from "@/components/kilo/audio-recorder";
 import AudioPlayer from "@/components/kilo/audio-player";
-
-type DashboardUser = {
-  id: string;
-  username: string;
-  email: string;
-  role: "admin" | "member" | null;
-  systemRole: "sysadmin" | "user";
-};
+import { AuthUser } from "@/types/auth";
 
 type GuestDashboardClientProps = {
-  user: DashboardUser;
+  user: AuthUser;
 };
 
 export default function GuestDashboardClient({ user }: GuestDashboardClientProps) {

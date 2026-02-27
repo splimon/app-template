@@ -1,12 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { validateSessionFromCookies } from "@/lib/auth/session";
+import { getAuthUser } from "@/lib/auth/session";
 import { fetchAdminDashboardData } from "@/lib/data/admin";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 export default async function AdminDashboard() {
-  const cookieStore = await cookies();
-  const user = await validateSessionFromCookies(cookieStore);
+  let user;
+  try {
+    user = await getAuthUser();
+  } catch {
+    redirect("/login?type=user");
+  }
 
   // Role guard - redirect if not admin
   if (user.system_role === "sysadmin" || user.role !== "admin") {

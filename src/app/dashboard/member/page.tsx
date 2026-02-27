@@ -1,12 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { validateSessionFromCookies } from "@/lib/auth/session";
+import { getAuthUser } from "@/lib/auth/session";
 import { fetchMemberDashboardData } from "@/lib/data/member";
 import MemberDashboardClient from "./MemberDashboardClient";
 
 export default async function MemberDashboard() {
-  const cookieStore = await cookies();
-  const user = await validateSessionFromCookies(cookieStore);
+  let user;
+  try {
+    user = await getAuthUser();
+  } catch {
+    redirect("/login?type=user");
+  }
 
   // Role guard - redirect if not member
   if (user.system_role === "sysadmin" || user.role !== "member") {

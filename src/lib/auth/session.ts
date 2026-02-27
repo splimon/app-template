@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-// Removed React.cache import – caching not needed for API auth
+import { cache } from 'react';
+import { cookies } from 'next/headers';
 import { AuthUser, SessionType } from '../../types/auth';
 import { deleteTokenInDB, generateToken, hashToken, storeTokenInDB } from './token';
 import { CookieStore, getSessionCookieFromBrowser, setSessionCookieInBrowser } from './browser';
@@ -17,9 +18,6 @@ function getExpirationDate(): Date {
 
 /**
  * Core session validation logic - validates a session token and returns user data.
- * This is the shared implementation used by both validateSession and validateSessionFromCookies.
- * Wrapped with React.cache() to memoize results during a single server request.
- *
  * @param hashedToken The hashed session token to validate
  * @param sessionType The expected session type ('user' or 'sysadmin')
  * @returns AuthUser object if session is valid
@@ -45,6 +43,28 @@ const validateSessionCore = async (hashedToken: string, sessionType: SessionType
 
     return { ...account, role } as AuthUser;
 };
+
+/**
+ * Cached session validation for Server Components.
+ * Uses React.cache() to deduplicate within a single request - multiple components
+ * calling this function will only trigger ONE database query per request.
+ *
+ * Important: This is NOT cross-request caching. Each new page load validates fresh.
+ *
+ * @returns AuthUser if session is valid
+ * @throws Errors.NO_SESSION if session is invalid or missing
+ */
+export const getAuthUser = cache(async (): Promise<AuthUser> => {
+    const cookieStore = await cookies();
+    const sessionCookie = getSessionCookieFromBrowser(cookieStore);
+
+    if (!sessionCookie) {
+        throw Errors.NO_SESSION;
+    }
+
+    const hashedToken = hashToken(sessionCookie.token);
+    return validateSessionCore(hashedToken, sessionCookie.type);
+});
 
 /**
  * Creates a new user session.
