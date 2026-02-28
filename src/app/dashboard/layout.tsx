@@ -12,7 +12,9 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
   let user;
   try {
-    user = await getAuthUser();
+    // store user in server cache 
+    user = await getAuthUser(); 
+    // then storing user in AuthContext for client reference
   } catch {
     redirect("/login");
   }
