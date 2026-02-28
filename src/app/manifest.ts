@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Kilo Tracker',
-    short_name: 'Kilo',
+    short_name: 'Kilo Tracker',
     description: 'Track your fitness goals with Kilo Tracker',
     start_url: '/dashboard',
     display: 'standalone',
