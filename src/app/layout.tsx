@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/contexts/AuthContext";
+import { PWAProvider } from "@/hooks/contexts/PWAContext";
+import { InstallPromptProvider } from "@/components/pwa/InstallPromptProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,10 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PMF App Template",
-  description: "A production-ready multi-tenant application template with comprehensive authentication and role-based access control",
+  title: "Kilo Tracker",
+  description: "Track your fitness goals with Kilo Tracker",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Kilo",
+  },
   icons: {
     icon: '/favicon.ico',
+    apple: '/icons/apple-touch-icon.png',
   },
 };
 
@@ -31,9 +40,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <PWAProvider>
+          <AuthProvider>
+            <InstallPromptProvider />
+            {children}
+          </AuthProvider>
+        </PWAProvider>
       </body>
     </html>
   );

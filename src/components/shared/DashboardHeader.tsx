@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/contexts/AuthContext";
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 type HeaderUser = {
   username: string;
@@ -59,6 +60,8 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
           {user.orgName}
         </span>
       )}
+
+      <InstallButton />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
